@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farm Wise AI – AI Powered Smart Agriculture Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="/static/css/main.css?v=4" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar: Pure Description & Public Links -->
+  <nav class="navbar-fw">
+    <a href="/index.html" class="brand">
+      <div class="logo-icon">🌾</div>
+      <span>Farm Wise <span style="color:var(--primary)">AI</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/index.html" class="active">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#impact">Impact</a></li>
+    </ul>
+    <div class="nav-actions" id="nav-auth-actions">
+      <a href="/login.html" class="btn-ghost-fw">Login</a>
+      <a href="/register.html" class="btn-primary-fw">Get Started <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </nav>
+
+  <!-- Hero Section: Description & Value Proposition -->
+  <section class="hero-section">
+    <div class="container-fw">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="hero-badge">✦ AI POWERED SMART AGRICULTURE</div>
+          <h1 class="hero-title">
+            Grow Smarter with <span class="highlight">Artificial Intelligence</span>
+          </h1>
+          <p class="hero-subtitle">
+            Farm Wise AI helps farmers make intelligent decisions using real-time data, machine learning, IoT insights, and advanced analytics to increase crop yield, reduce costs, and maximize profits.
+          </p>
+          <div class="hero-actions">
+            <a href="/register.html" class="btn-primary-fw btn-lg">Get Started Free <i class="fas fa-arrow-right"></i></a>
+            <a href="/login.html" class="btn-outline-fw btn-lg">Farmer Login</a>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="hero-image-wrapper">
+            <img src="/static/images/hero_farm.jpg" alt="Smart Farming" class="hero-main-img" onerror="this.src='https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=900&q=80&fit=crop';">
+            
+            <!-- Floating Data Widgets -->
+            <div class="float-card float-card-temp">
+              <div style="font-size:1.5rem;">🌡️</div>
+              <div style="font-size:0.7rem;color:var(--text-light);">Temperature</div>
+              <div style="font-size:1.4rem;font-weight:800;">24°C</div>
+            </div>
+            <div class="float-card float-card-hum">
+              <div style="font-size:1.5rem;">💧</div>
+              <div style="font-size:0.7rem;color:var(--text-light);">Humidity</div>
+              <div style="font-size:1.4rem;font-weight:800;">65%</div>
+            </div>
+            <div class="float-card float-card-soil">
+              <div style="font-size:0.7rem;color:var(--text-muted);">Soil Moisture</div>
+              <div style="font-size:1.4rem;font-weight:800;">42%</div>
+            </div>
+            <div class="float-card float-card-ai">
+              <div style="font-size:0.7rem;color:var(--primary);font-weight:700;">🤖 AI Recommendation</div>
+              <div style="font-size:1.2rem;font-weight:800;">Tomato 🍅</div>
+              <div class="badge-green">92% Match</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platform Overview / Description Section -->
+  <section class="section-pad bg-white" id="about">
+    <div class="container-fw">
+      <div class="text-center mb-5">
+        <div class="hero-badge">✦ ABOUT FARM WISE AI</div>
+        <h2 style="font-size:2.2rem;font-weight:800;">An Intelligent Platform Tailored for Farmers</h2>
+        <p style="color:var(--text-muted);max-width:700px;margin:1rem auto 0;font-size:1.05rem;">
+          Farm Wise AI combines Machine Learning, Plant Pathology Image Recognition, Live Satellite Weather Feeds, and Commodity Market Analytics into a single, seamless SaaS dashboard.
+        </p>
+      </div>
+
+      <div class="row g-4" id="features">
+        <div class="col-md-4">
+          <div class="glass-card feature-card h-100">
+            <div class="feature-icon">🌾</div>
+            <h4>AI Crop Recommender</h4>
+            <p style="color:var(--text-muted);font-size:0.9rem;">Analyses soil Nitrogen (N), Phosphorus (P), Potassium (K), pH, temperature, and rainfall to recommend crops with highest yield probability.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card feature-card h-100">
+            <div class="feature-icon">🔬</div>
+            <h4>Disease Diagnosis</h4>
+            <p style="color:var(--text-muted);font-size:0.9rem;">Upload photos of damaged leaves to instantly identify bacterial, fungal, or viral infections and receive prescribed organic and chemical treatments.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card feature-card h-100">
+            <div class="feature-icon">🌤️</div>
+            <h4>Weather & Market Forecasts</h4>
+            <p style="color:var(--text-muted);font-size:0.9rem;">Real-time weather tracking, 7-day precipitation forecasts, and APMC market price trends to help you sell at peak profit margins.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impact Statistics -->
+  <section class="stats-bar text-center" id="impact">
+    <div class="container-fw">
+      <div class="row g-4">
+        <div class="col-md-3 col-6"><div class="stat-number" id="stat-farmers">...</div><div class="stat-label">Registered Farmers</div></div>
+        <div class="col-md-3 col-6"><div class="stat-number" id="stat-predictions">...</div><div class="stat-label">AI Predictions</div></div>
+        <div class="col-md-3 col-6"><div class="stat-number" id="stat-accuracy">98%</div><div class="stat-label">Prediction Accuracy</div></div>
+        <div class="col-md-3 col-6"><div class="stat-number" id="stat-districts">...</div><div class="stat-label">Districts Covered</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section-pad" style="background:var(--bg-soft);">
+    <div class="container-fw text-center">
+      <h2 style="font-size:2rem;font-weight:800;margin-bottom:1rem;">Ready to Transform Your Farming?</h2>
+      <p style="color:var(--text-muted);max-width:550px;margin:0 auto 2rem;">Sign in or create a free account to access your complete AI SaaS farming dashboard.</p>
+      <a href="/register.html" class="btn-primary-fw btn-lg">Create Free Account <i class="fas fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- Floating Chatbot Widget -->
+  <div class="chatbot-widget">
+    <div class="chatbot-panel" id="chatbotPanel">
+      <div class="chatbot-header">
+        <div><strong>Farm Wise AI Assistant</strong></div>
+        <button onclick="toggleChatbot()" style="background:none;border:none;color:white;margin-left:auto;">✕</button>
+      </div>
+      <div class="chatbot-messages" id="chatMessages">
+        <div class="chat-msg bot">👋 Hello! I am Farm Wise AI Assistant. Log in to access all smart tools in your farmer dashboard!</div>
+      </div>
+      <div class="chatbot-input-area">
+        <input type="text" id="chatInput" class="chatbot-input" placeholder="Ask farming question...">
+        <button onclick="sendChatMessage()" class="btn-primary-fw" style="padding:0.5rem 1rem;">Send</button>
+      </div>
+    </div>
+    <button class="chatbot-toggle" onclick="toggleChatbot()">🌾</button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer-fw text-center">
+    <div class="container-fw">
+      <p>© 2026 Farm Wise AI – Smart Agriculture Platform.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js?v=4"></script>
+</body>
+</html>

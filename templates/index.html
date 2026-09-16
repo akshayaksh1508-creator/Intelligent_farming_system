@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}Farm Wise AI – Grow Smarter with Artificial Intelligence{% endblock %}
+{% block meta_description %}Farm Wise AI helps farmers make intelligent decisions using real-time data, machine learning, and advanced analytics to increase productivity and maximize profits.{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════════════════════════════
+     HERO SECTION
+══════════════════════════════════════════════════════════════ -->
+<link rel="stylesheet" href="../../static/css/main.css">
+<section class="hero-section" id="home">
+  <div class="container-fw">
+    <div class="row align-items-center g-5">
+
+      <!-- Left: Copy -->
+      <div class="col-lg-5">
+        <div class="hero-badge animate-on-scroll">
+          <span style="width:8px;height:8px;background:var(--primary);border-radius:50%;display:inline-block;animation:pulse-ring 1.5s ease infinite;"></span>
+          ✦ AI POWERED SMART FARMING
+        </div>
+
+        <h1 class="hero-title animate-on-scroll">
+          Grow Smarter with
+          <span class="highlight">Artificial Intelligence</span>
+        </h1>
+
+        <p class="hero-subtitle animate-on-scroll">
+          Farm Wise AI helps farmers make intelligent decisions using real-time data, machine learning, and advanced analytics to increase productivity, reduce costs, and maximize profits.
+        </p>
+
+        <div class="hero-actions animate-on-scroll">
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-fw btn-lg">
+            Get Started <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="#features" class="btn-ghost-fw btn-lg">
+            <i class="fas fa-play-circle" style="color:var(--primary);"></i>
+            Explore AI
+          </a>
+        </div>
+
+        <!-- Trust Row -->
+        <div class="d-flex align-items-center gap-3 mt-4 animate-on-scroll" style="opacity:0.85;">
+          <div class="d-flex" style="margin-right:0.25rem;">
+            {% for i in range(5) %}
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));border:2px solid white;margin-right:-6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:white;font-weight:700;">{{ ['R','S','M','P','K'][i] }}</div>
+            {% endfor %}
+          </div>
+          <p style="font-size:0.825rem;color:var(--text-muted);">
+            <strong style="color:var(--text);">100,000+</strong> farmers trust Farm Wise AI
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Image + Floating Cards -->
+      <div class="col-lg-7">
+        <div class="hero-image-wrapper animate-on-scroll">
+          <img
+            src="{{ url_for('static', filename='images/hero_farm.jpg') }}"
+            alt="Smart Farming with AI"
+            class="hero-main-img"
+            onerror="this.src='https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=900&q=80&fit=crop';this.onerror=null;"
+          >
+
+          <!-- Floating Cards -->
+          <div class="float-card float-card-temp">
+            <div class="card-icon">🌡️</div>
+            <div class="card-label">Temperature</div>
+            <div class="card-value">24°C</div>
+            <div class="card-sub">Feels like 26°C</div>
+          </div>
+
+          <div class="float-card float-card-hum">
+            <div class="card-icon">💧</div>
+            <div class="card-label">Humidity</div>
+            <div class="card-value">65%</div>
+            <div class="card-sub">Optimal</div>
+          </div>
+
+          <div class="float-card float-card-soil">
+            <div class="card-label" style="font-size:0.72rem;color:var(--text-muted);">Soil Moisture</div>
+            <div class="card-value" style="font-size:1.6rem;">42%</div>
+            <div class="card-sub" style="color:var(--primary);">Moderate ✓</div>
+          </div>
+
+          <div class="float-card float-card-ai" style="min-width:190px;">
+            <div style="font-size:0.7rem;color:var(--primary);font-weight:700;margin-bottom:0.3rem;">🤖 AI Recommendation</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.4rem;">Best Crop for Current Conditions</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span style="font-size:1.8rem;">🍅</span>
+              <div>
+                <div style="font-size:1.2rem;font-weight:800;color:var(--text);">Tomato</div>
+                <div class="badge-green">92% Match</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="float-card float-card-price">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.2rem;">
+              <div class="card-label">Market Price</div>
+              <span style="color:var(--primary);font-size:0.75rem;font-weight:600;">+</span>
+            </div>
+            <div class="card-value" style="font-size:1.1rem;">₹2,450<span style="font-size:0.7rem;font-weight:500;">/quintal</span></div>
+            <div class="trend-up"><i class="fas fa-arrow-up"></i> +12.5%</div>
+          </div>
+
+          <div class="float-card float-card-rain">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+              <span style="font-size:1.2rem;">🌧️</span>
+              <div>
+                <div class="card-label">Rain Forecast</div>
+                <div style="font-weight:800;font-size:1.1rem;">15 mm</div>
+                <div class="card-sub">Tomorrow</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FEATURES STRIP
+══════════════════════════════════════════════════════════════ -->
+<section class="section-pad-sm bg-white">
+  <div class="container-fw">
+    <div class="features-strip">
+      <div class="row g-0 justify-content-between">
+        {% set strip_items = [
+          ('🌾', 'AI Crop\nRecommendation', url_for('crop.recommendation')),
+          ('🔬', 'Plant Disease\nDetection', url_for('disease.detection')),
+          ('🌤️', 'Weather\nIntelligence', url_for('weather.index')),
+          ('📈', 'Market Price\nPrediction', url_for('marketplace.index')),
+          ('🧪', 'Soil\nAnalysis', url_for('crop.recommendation')),
+          ('💧', 'Smart\nIrrigation', url_for('chatbot.index')),
+          ('🎙️', 'Voice AI\nAssistant', url_for('chatbot.index')),
+          ('🌿', 'Carbon Farming\nAdvisor', url_for('carbon.index')),
+        ] %}
+        {% for icon, label, url in strip_items %}
+        <div class="col text-center px-1">
+          <a href="{{ url }}" class="strip-item d-block text-decoration-none">
+            <div class="strip-icon mx-auto">{{ icon }}</div>
+            <p style="font-size:0.72rem;font-weight:600;color:var(--text-muted);white-space:pre-line;line-height:1.3;">{{ label }}</p>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     STATS BAR
+══════════════════════════════════════════════════════════════ -->
+<section class="stats-bar">
+  <div class="container-fw">
+    <div class="d-flex align-items-center justify-content-center flex-wrap">
+      <div class="stat-item">
+        <div class="stat-icon">👨‍🌾</div>
+        <span class="stat-number" data-target="100000" data-suffix="+">0</span>
+        <div class="stat-label">Happy Farmers</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-icon">🤖</div>
+        <span class="stat-number" data-target="5000000" data-suffix="+">0</span>
+        <div class="stat-label">Predictions Made</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-icon">🎯</div>
+        <span class="stat-number" data-target="98" data-suffix="%">0</span>
+        <div class="stat-label">Prediction Accuracy</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-icon">📍</div>
+        <span class="stat-number" data-target="700" data-suffix="+">0</span>
+        <div class="stat-label">Districts Covered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     FEATURES SECTION
+══════════════════════════════════════════════════════════════ -->
+<section class="section-pad bg-gradient-green" id="features">
+  <div class="container-fw">
+    <div class="section-header animate-on-scroll">
+      <div class="section-badge">✦ EVERYTHING YOU NEED</div>
+      <h2 class="section-title">Powerful AI Tools for<br>Modern Agriculture</h2>
+      <div class="divider my-3"></div>
+      <p class="section-subtitle">From crop recommendations to disease detection, we've built every tool a farmer needs to succeed in today's data-driven agriculture landscape.</p>
+    </div>
+
+    <div class="row g-4">
+      {% set features = [
+        ('🌾', 'AI Crop Recommendation', 'Get personalized crop suggestions based on your soil type, climate, NPK levels, and market demand using our Random Forest ML model.', url_for('crop.recommendation'), 'metric-green'),
+        ('🔬', 'Disease Detection', 'Upload a photo of your plant and our AI will instantly identify diseases, provide treatment plans, and recommend medicines.', url_for('disease.detection'), 'metric-red'),
+        ('🌤️', 'Weather Intelligence', 'Real-time weather forecasts, 7-day predictions, rainfall alerts, and farm-specific weather advisories powered by WeatherAPI.', url_for('weather.index'), 'metric-blue'),
+        ('📈', 'Market Prediction', 'Track live commodity prices across 1000+ markets, trend analysis, and AI-powered price forecasts to sell at the right time.', url_for('marketplace.index'), 'metric-gold'),
+        ('🧪', 'Soil Analysis', 'Input your soil parameters and get a comprehensive health score, deficiency analysis, and crop suitability recommendations.', url_for('crop.recommendation'), 'metric-green'),
+        ('💧', 'Smart Irrigation', 'AI-driven irrigation scheduling based on soil moisture, evapotranspiration, weather forecasts, and crop water requirements.', url_for('chatbot.index'), 'metric-blue'),
+        ('🌿', 'Carbon Farming', 'Estimate your carbon credits, recommend sustainable practices, and generate carbon certificates for carbon market participation.', url_for('carbon.index'), 'metric-green'),
+        ('🎙️', 'Voice AI Assistant', 'Multilingual voice assistant supporting English, Hindi, Kannada, Tamil, Telugu, and Marathi for hands-free farming guidance.', url_for('chatbot.index'), 'metric-gold'),
+        ('🏛️', 'Government Schemes', 'Browse 100+ government schemes, check eligibility, required documents, and apply directly with guided assistance.', url_for('schemes.index'), 'metric-red'),
+        ('🛒', 'Marketplace', 'Buy quality seeds, fertilizers, pesticides, and farm equipment from verified vendors with competitive pricing.', url_for('marketplace.index'), 'metric-blue'),
+        ('👥', 'Farmer Community', 'Connect with 100,000+ farmers, share experiences, ask questions, and learn from agricultural experts nationwide.', '#community', 'metric-green'),
+        ('📊', 'Farm Analytics', 'Track yield trends, profit analysis, cost optimization, and get personalized recommendations to improve farm performance.', url_for('dashboard.index'), 'metric-gold'),
+      ] %}
+
+      {% for icon, title, desc, url, badge_class in features %}
+      <div class="col-lg-3 col-md-4 col-sm-6 animate-on-scroll">
+        <div class="glass-card feature-card h-100">
+          <div class="feature-icon">{{ icon }}</div>
+          <h3>{{ title }}</h3>
+          <p>{{ desc }}</p>
+          <a href="{{ url }}" class="learn-more-link">
+            Learn More <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DASHBOARD PREVIEW SECTION
+══════════════════════════════════════════════════════════════ -->
+<section class="section-pad bg-white">
+  <div class="container-fw">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5 animate-on-scroll">
+        <div class="section-badge">✦ PROFESSIONAL DASHBOARD</div>
+        <h2 class="section-title text-start">Everything in One<br>Smart Dashboard</h2>
+        <p style="color:var(--text-muted);line-height:1.7;margin-bottom:1.5rem;">Your complete farm management hub — monitor weather, track crop health, view market prices, and access AI insights from a single, beautiful interface.</p>
+
+        <div class="d-flex flex-column gap-3">
+          {% for feature in [
+            ('📊', 'Real-time Analytics', 'Live charts for yield, profit, and market trends'),
+            ('🔔', 'Smart Alerts', 'Disease warnings, weather alerts, price notifications'),
+            ('📱', 'Mobile Ready', 'Access your farm data anywhere, anytime'),
+          ] %}
+          <div class="d-flex align-items-start gap-3">
+            <div style="width:40px;height:40px;border-radius:10px;background:var(--primary-pale);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">{{ feature[0] }}</div>
+            <div>
+              <div style="font-weight:700;font-size:0.925rem;">{{ feature[1] }}</div>
+              <div style="font-size:0.825rem;color:var(--text-muted);">{{ feature[2] }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-4">
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-fw btn-lg">
+            Access Dashboard <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-7 animate-on-scroll">
+        <div class="dashboard-preview">
+          <div class="preview-topbar">
+            <div class="preview-dot dot-red"></div>
+            <div class="preview-dot dot-yellow"></div>
+            <div class="preview-dot dot-green"></div>
+            <span style="margin-left:0.5rem;font-size:0.78rem;color:var(--text-muted);">Farm Wise AI – Dashboard</span>
+          </div>
+          <div class="p-3">
+            <!-- Mini Dashboard -->
+            <div class="row g-2 mb-3">
+              <div class="col-3">
+                <div class="metric-card">
+                  <div class="metric-label">Today's Weather</div>
+                  <div class="metric-value" style="font-size:1.3rem;">24°C</div>
+                  <div class="metric-sub">☁️ Partly Cloudy</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="metric-card">
+                  <div class="metric-label">Crop Rec.</div>
+                  <div style="font-weight:800;color:var(--primary);font-size:1rem;">Tomato 🍅</div>
+                  <div class="metric-sub badge-green" style="display:inline-block;margin-top:0.25rem;">92% Match</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="metric-card">
+                  <div class="metric-label">Market Price</div>
+                  <div class="metric-value" style="font-size:1rem;">₹2,450</div>
+                  <div class="trend-up"><i class="fas fa-arrow-up"></i> +12.5%</div>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="metric-card">
+                  <div class="metric-label">AI Insights</div>
+                  <div class="metric-value" style="font-size:1.3rem;">3</div>
+                  <div class="metric-sub" style="color:var(--primary);">New Recs</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="dash-card" style="padding:1rem;">
+                  <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:0.5rem;">Yield Prediction</div>
+                  <canvas id="heroYieldChart" height="80"></canvas>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="dash-card" style="padding:1rem;">
+                  <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:0.5rem;">Profit Forecast</div>
+                  <canvas id="heroProfitChart" height="80"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MARKET PRICES PREVIEW
+══════════════════════════════════════════════════════════════ -->
+<section class="section-pad" style="background: var(--bg-soft);">
+  <div class="container-fw">
+    <div class="section-header animate-on-scroll">
+      <div class="section-badge">✦ LIVE MARKET DATA</div>
+      <h2 class="section-title">Real-Time Crop Prices</h2>
+      <p class="section-subtitle">Stay updated with live commodity prices from markets across India to sell at the best time.</p>
+    </div>
+
+    <div class="row g-3 animate-on-scroll">
+      {% for p in prices %}
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="glass-card" style="padding:1.25rem;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span style="font-weight:700;font-size:0.95rem;">{{ p.crop }}</span>
+            <span class="{% if p.trend == 'up' %}trend-up{% elif p.trend == 'down' %}trend-down{% else %}trend-stable{% endif %}">
+              <i class="fas fa-arrow-{% if p.trend == 'up' %}up{% elif p.trend == 'down' %}down{% else %}right{% endif %}"></i>
+              {{ p.change_pct | abs }}%
+            </span>
+          </div>
+          <div style="font-size:1.4rem;font-weight:900;color:var(--text);">{{ "{:,.0f}".format(p.price) }}</div>
+          <div style="font-size:0.775rem;color:var(--text-muted);">per {{ p.unit }} &bull; {{ p.market }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4 animate-on-scroll">
+      <a href="{{ url_for('marketplace.index') }}" class="btn-primary-fw btn-lg">
+        View All Prices <i class="fas fa-chart-line"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     AI CHATBOT FEATURE HIGHLIGHT
+══════════════════════════════════════════════════════════════ -->
+<section class="section-pad">
+  <div class="container-fw">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 animate-on-scroll">
+        <div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));border-radius:var(--radius-xl);padding:2.5rem;color:white;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.1),transparent);border-radius:50%;"></div>
+          <div style="font-size:3rem;margin-bottom:1rem;">🤖</div>
+          <h3 style="font-size:1.5rem;font-weight:800;margin-bottom:0.75rem;">AI Chatbot Assistant</h3>
+          <p style="opacity:0.9;margin-bottom:1.5rem;">Get instant answers to all your farming questions in your language.</p>
+
+          <!-- Mock chat -->
+          <div style="background:rgba(255,255,255,0.12);border-radius:14px;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;">
+            <div style="background:rgba(255,255,255,0.2);border-radius:12px 12px 12px 4px;padding:0.7rem 1rem;font-size:0.85rem;max-width:80%;">🌾 Which crop should I grow this Kharif season?</div>
+            <div style="background:white;border-radius:12px 12px 4px 12px;padding:0.7rem 1rem;font-size:0.85rem;color:var(--text);max-width:90%;align-self:flex-end;">Based on your soil (loamy) and rainfall (80mm), I recommend <strong>Soybean</strong> with 87% confidence! Expected yield: 28 quintals/ha.</div>
+          </div>
+
+          <a href="{{ url_for('chatbot.index') }}" class="btn-primary-fw mt-3" style="background:white;color:var(--primary);">Chat Now <i class="fas fa-comments"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-6 animate-on-scroll">
+        <div class="section-badge">✦ MULTILINGUAL AI</div>
+        <h2 class="section-title text-start" style="font-size:2rem;">Your Personal Farm<br>AI Assistant</h2>
+        <p style="color:var(--text-muted);line-height:1.7;margin-bottom:1.5rem;">Ask questions in English, Hindi, Kannada, Tamil, Telugu, or Marathi. Our AI understands your language and gives practical, actionable farming advice.</p>
+
+        <div class="row g-3">
+          {% for lang, flag in [('English', '🇬🇧'), ('हिंदी', '🇮🇳'), ('ಕನ್ನಡ', '🌾'), ('தமிழ்', '🌿'), ('తెలుగు', '🍃'), ('मराठी', '🌱')] %}
+          <div class="col-4">
+            <div class="glass-card" style="padding:0.85rem;text-align:center;">
+              <div style="font-size:1.5rem;">{{ flag }}</div>
+              <div style="font-size:0.8rem;font-weight:600;margin-top:0.25rem;">{{ lang }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CTA SECTION
+══════════════════════════════════════════════════════════════ -->
+<section style="background:linear-gradient(135deg,var(--primary-darker) 0%,var(--primary-dark) 50%,var(--primary) 100%);padding:5rem 0;position:relative;overflow:hidden;">
+  <div
+    style="
+    position:absolute;
+    inset:0;
+    background:rgba(255,255,255,.03);
+    opacity:.4;
+">
+</div>
+  <div class="container-fw text-center" style="position:relative;">
+    <div class="animate-on-scroll">
+      <div style="font-size:3rem;margin-bottom:1rem;">🌾</div>
+      <h2 style="font-size:2.5rem;font-weight:900;color:white;margin-bottom:1rem;">Start Growing Smarter Today</h2>
+      <p style="color:rgba(255,255,255,0.8);max-width:500px;margin:0 auto 2rem;font-size:1.05rem;line-height:1.7;">Join 100,000+ Indian farmers using AI to make better farming decisions and maximize their harvest profits.</p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('auth.register') }}" class="btn-primary-fw btn-lg" style="background:white;color:var(--primary);">
+          Get Started Free <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="{{ url_for('chatbot.index') }}" class="btn-outline-fw btn-lg" style="border-color:rgba(255,255,255,0.5);color:white;">
+          Try AI Chatbot
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  if (typeof Chart !== "undefined") {
+
+    Chart.defaults.font.family = "Inter";
+
+    // your chart code here
+
+}
+// Hero mini dashboard charts
+Chart.defaults.font.family = 'Inter';
+
+new Chart(document.getElementById('heroYieldChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{
+      data: [30,42,38,55,48,62],
+      borderColor: '#059669',
+      backgroundColor: 'rgba(5,150,105,0.08)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointRadius: 0,
+    }]
+  },
+  options: { plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, animation:{duration:2000} }
+});
+
+new Chart(document.getElementById('heroProfitChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{
+      data: [45000,62000,55000,78000,70000,95000],
+      backgroundColor: ['rgba(5,150,105,0.5)','rgba(5,150,105,0.6)','rgba(5,150,105,0.7)','rgba(5,150,105,0.8)','rgba(5,150,105,0.9)','rgba(5,150,105,1)'],
+      borderRadius: 4,
+      borderWidth: 0,
+    }]
+  },
+  options: { plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}}, animation:{duration:2000} }
+});
+</script>
+{% endblock %}

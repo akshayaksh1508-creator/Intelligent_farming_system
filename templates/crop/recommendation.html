@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}AI Crop Recommendation – Farm Wise AI{% endblock %}
+{% block meta_description %}Get personalized crop recommendations based on your soil, climate, and market conditions using AI.{% endblock %}
+
+{% block content %}
+<div style="padding-top:var(--navbar-h);min-height:100vh;background:var(--bg-soft);">
+
+  <!-- Page Header -->
+  <div style="background:linear-gradient(135deg,var(--primary-darker),var(--primary));padding:3rem 0;">
+    <div class="container-fw">
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <a href="{{ url_for('main.index') }}" style="color:rgba(255,255,255,0.7);font-size:0.875rem;text-decoration:none;">Home</a>
+        <span style="color:rgba(255,255,255,0.5);">›</span>
+        <span style="color:white;font-size:0.875rem;">Crop Recommendation</span>
+      </div>
+      <h1 style="font-size:2rem;font-weight:900;color:white;margin-bottom:0.5rem;">🌾 AI Crop Recommendation</h1>
+      <p style="color:rgba(255,255,255,0.85);max-width:600px;">Enter your farm parameters and our Random Forest ML model will recommend the best crops for your conditions with high accuracy.</p>
+    </div>
+  </div>
+
+  <div class="container-fw" style="padding-top:2rem;padding-bottom:3rem;">
+    <div class="row g-4">
+
+      <!-- Input Form -->
+      <div class="col-lg-5">
+        <div class="glass-card" style="padding:2rem;">
+          <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.5rem;">
+            <span style="width:32px;height:32px;background:var(--primary-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;">🧪</span>
+            Farm Parameters
+          </h3>
+
+          <form method="POST" action="{{ url_for('crop.predict') }}" id="cropForm">
+
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>State</label>
+                  <select name="state" class="form-control-fw">
+                    {% for s in states %}<option {% if form_data and form_data.get('state')==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Season</label>
+                  <select name="season" class="form-control-fw">
+                    {% for s in seasons %}<option {% if form_data and form_data.get('season')==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Soil Type</label>
+                  <select name="soil_type" class="form-control-fw">
+                    {% for s in soil_types %}<option {% if form_data and form_data.get('soil_type')==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Land Area (hectare)</label>
+                  <input type="number" name="land_area" class="form-control-fw" step="0.1" min="0.1" value="{{ form_data.land_area if form_data else '1.0' }}" required>
+                </div>
+              </div>
+
+              <!-- NPK -->
+              <div class="col-12"><p style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin:0.5rem 0 0;">Soil Nutrients (kg/ha)</p></div>
+              <div class="col-4">
+                <div class="form-group-fw">
+                  <label>Nitrogen (N)</label>
+                  <input type="number" name="nitrogen" class="form-control-fw" min="0" max="300" value="{{ form_data.nitrogen if form_data else '80' }}" required>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="form-group-fw">
+                  <label>Phosphorus (P)</label>
+                  <input type="number" name="phosphorus" class="form-control-fw" min="0" max="200" value="{{ form_data.phosphorus if form_data else '60' }}" required>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="form-group-fw">
+                  <label>Potassium (K)</label>
+                  <input type="number" name="potassium" class="form-control-fw" min="0" max="200" value="{{ form_data.potassium if form_data else '40' }}" required>
+                </div>
+              </div>
+
+              <!-- Climate -->
+              <div class="col-12"><p style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin:0.5rem 0 0;">Climate Conditions</p></div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Soil pH</label>
+                  <input type="number" name="ph" class="form-control-fw" step="0.1" min="4" max="9" value="{{ form_data.ph if form_data else '6.5' }}" required>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Temperature (°C)</label>
+                  <input type="number" name="temperature" class="form-control-fw" min="5" max="50" value="{{ form_data.temperature if form_data else '28' }}" required>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Humidity (%)</label>
+                  <input type="number" name="humidity" class="form-control-fw" min="10" max="100" value="{{ form_data.humidity if form_data else '65' }}" required>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group-fw">
+                  <label>Rainfall (mm)</label>
+                  <input type="number" name="rainfall" class="form-control-fw" min="0" max="500" value="{{ form_data.rainfall if form_data else '80' }}" required>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group-fw">
+                  <label>Previous Crop (optional)</label>
+                  <input type="text" name="previous_crop" class="form-control-fw" placeholder="e.g. Rice, Wheat, Cotton..." value="{{ form_data.previous_crop if form_data else '' }}">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary-fw w-100 mt-3" style="justify-content:center;padding:0.85rem;font-size:1rem;" id="submitBtn">
+              <i class="fas fa-brain"></i> Get AI Recommendation
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="col-lg-7">
+        {% if result %}
+        <!-- ── AI Result ── -->
+        <div class="result-card mb-4" style="animation:slideUp 0.5s ease;">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">🤖 AI Recommended Crop</div>
+              <div class="result-crop-name">{{ result.recommended_crop }}</div>
+              <div style="display:flex;align-items:center;gap:1rem;margin-top:0.75rem;">
+                <div>
+                  <div style="font-size:0.75rem;color:var(--text-muted);">Confidence</div>
+                  <div class="confidence-bar" style="width:120px;">
+                    <div class="confidence-fill" ></div>
+                  </div>
+                  <div style="font-weight:700;color:var(--primary);">{{ result.confidence }}%</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4 text-center">
+              <div style="font-size:5rem;">
+                {% set crop_emojis = {'Tomato':'🍅','Rice':'🌾','Wheat':'🌾','Maize':'🌽','Cotton':'🌿','Sugarcane':'🎋','Soybean':'🌱','Groundnut':'🥜','Mustard':'🌼','Chickpea':'🫘','Potato':'🥔','Onion':'🧅'} %}
+                {{ crop_emojis.get(result.recommended_crop, '🌱') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="metric-card text-center">
+              <div style="font-size:1.5rem;margin-bottom:0.25rem;">📦</div>
+              <div style="font-size:1.2rem;font-weight:800;">{{ result.expected_yield }}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Quintals/Hectare</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-card text-center">
+              <div style="font-size:1.5rem;margin-bottom:0.25rem;">💰</div>
+              <div style="font-size:1.2rem;font-weight:800;">₹{{ result.expected_profit | int }}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Est. Profit</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-card text-center">
+              <div style="font-size:1.5rem;margin-bottom:0.25rem;">⏱️</div>
+              <div style="font-size:0.9rem;font-weight:700;">{{ result.harvest_time }}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Harvest Time</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="metric-card text-center">
+              <div style="font-size:1.5rem;margin-bottom:0.25rem;">💧</div>
+              <div style="font-size:0.85rem;font-weight:700;">{{ result.water_requirement }}</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Water Req.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fertilizer -->
+        <div class="glass-card" style="padding:1.5rem;margin-bottom:1rem;">
+          <h5 style="font-weight:700;margin-bottom:0.75rem;">🧪 Recommended Fertilizer</h5>
+          <p style="color:var(--text-muted);font-size:0.9rem;margin:0;">{{ result.fertilizer }}</p>
+        </div>
+
+        <!-- Alternative Crops -->
+        <div class="glass-card" style="padding:1.5rem;">
+          <h5 style="font-weight:700;margin-bottom:0.75rem;">🌿 Alternative Crops</h5>
+          <div class="d-flex gap-2 flex-wrap">
+            {% for alt in result.alternative_crops %}
+            <span class="badge-green" style="font-size:0.85rem;">{{ alt }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% else %}
+        <!-- Placeholder State -->
+        <div class="glass-card text-center" style="padding:4rem 2rem;">
+          <div style="font-size:5rem;margin-bottom:1rem;">🌾</div>
+          <h4 style="font-weight:800;margin-bottom:0.75rem;">Ready for AI Analysis</h4>
+          <p style="color:var(--text-muted);font-size:0.9rem;max-width:400px;margin:0 auto 1.5rem;">Fill in your farm parameters on the left and click <strong>Get AI Recommendation</strong> to see personalized crop suggestions.</p>
+          <div class="row g-3 mt-2">
+            {% for item in [('🌡️','Enter Climate Data','Temperature, humidity & rainfall'),('🧪','Add Soil Data','NPK levels and pH value'),('🤖','Get Recommendation','AI analyzes and predicts')] %}
+            <div class="col-4">
+              <div style="background:var(--bg-soft);border-radius:var(--radius-md);padding:1rem;text-align:center;">
+                <div style="font-size:1.5rem;margin-bottom:0.5rem;">{{ item[0] }}</div>
+                <div style="font-size:0.78rem;font-weight:700;">{{ item[1] }}</div>
+                <div style="font-size:0.72rem;color:var(--text-muted);">{{ item[2] }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('cropForm').addEventListener('submit', function() {
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<div class="spinner-fw" style="display:inline-block;width:16px;height:16px;border-width:2px;margin-right:8px;"></div> Analyzing...';
+  btn.disabled = true;
+});
+</script>
+{% endblock %}

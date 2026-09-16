@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Marketplace – Farm Wise AI{% endblock %}
+
+{% block content %}
+<div style="padding-top:var(--navbar-h);min-height:100vh;background:var(--bg-soft);">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#0c4a6e,#0369a1,#0ea5e9);padding:2.5rem 0;">
+    <div class="container-fw">
+      <h1 style="font-size:2rem;font-weight:900;color:white;margin-bottom:0.5rem;">🛒 Agricultural Marketplace</h1>
+      <p style="color:rgba(255,255,255,0.85);">Quality seeds, fertilizers, machinery and more from verified vendors</p>
+    </div>
+  </div>
+
+  <div class="container-fw" style="padding:2rem 0 3rem;">
+
+    <!-- Filters -->
+    <div class="glass-card" style="padding:1.25rem 1.5rem;margin-bottom:2rem;">
+      <form method="GET" action="{{ url_for('marketplace.index') }}" class="d-flex gap-3 align-items-center flex-wrap">
+        <div style="flex:1;min-width:200px;">
+          <div style="position:relative;">
+            <i class="fas fa-search" style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.875rem;"></i>
+            <input type="text" name="search" value="{{ search }}" class="form-control-fw" style="padding-left:2.5rem;" placeholder="Search products...">
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          {% for cat in categories %}
+          <a href="{{ url_for('marketplace.index', category=cat, search=search) }}"
+             class="{% if current_category == cat %}btn-primary-fw{% else %}btn-ghost-fw{% endif %}"
+             style="padding:0.45rem 1rem;font-size:0.825rem;border-radius:var(--radius-full);text-transform:capitalize;">
+            {{ '🌱' if cat=='seeds' else '🧪' if cat=='fertilizers' else '⚙️' if cat=='machinery' else '🐛' if cat=='pesticides' else '🌿' if cat=='organic' else '💧' if cat=='irrigation' else '🛒' }} {{ cat }}
+          </a>
+          {% endfor %}
+        </div>
+        <select name="sort" class="form-control-fw" style="width:auto;" onchange="this.form.submit()">
+          <option value="featured" {% if sort=='featured' %}selected{% endif %}>Featured</option>
+          <option value="price_asc" {% if sort=='price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if sort=='price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="rating" {% if sort=='rating' %}selected{% endif %}>Best Rated</option>
+        </select>
+      </form>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="row g-4">
+      {% for p in sample_products %}
+      {% if current_category == 'all' or p.category == current_category %}
+      <div class="col-xl-3 col-lg-4 col-md-6 animate-on-scroll">
+        <div class="glass-card" style="padding:0;overflow:hidden;display:flex;flex-direction:column;height:100%;">
+
+          <!-- Product Image -->
+          <div style="background:linear-gradient(135deg,var(--primary-pale),var(--bg-soft));padding:2rem;text-align:center;font-size:4rem;position:relative;">
+            {{ p.emoji }}
+            {% if p.is_organic %}
+            <span class="badge-green" style="position:absolute;top:0.75rem;left:0.75rem;">🌿 Organic</span>
+            {% endif %}
+            <button onclick="addToCart({{ loop.index }}, this)" style="position:absolute;top:0.75rem;right:0.75rem;background:white;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);transition:all 0.2s;" title="Add to Wishlist">
+              ♡
+            </button>
+          </div>
+
+          <div style="padding:1.25rem;flex:1;display:flex;flex-direction:column;">
+            <div class="badge-gray mb-2" style="display:inline-block;width:fit-content;text-transform:capitalize;">{{ p.category }}</div>
+            <h5 style="font-size:0.925rem;font-weight:700;margin-bottom:0.3rem;line-height:1.4;">{{ p.name }}</h5>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem;">{{ p.brand }}</div>
+
+            <div class="d-flex align-items-center gap-1 mb-2">
+              <span class="stars">{{ '★' * (p.rating | int) }}{{ '☆' * (5 - p.rating | int) }}</span>
+              <span style="font-size:0.75rem;color:var(--text-muted);">({{ p.review_count }})</span>
+            </div>
+
+            <div class="mt-auto">
+              <div style="font-size:1.4rem;font-weight:900;color:var(--text);">₹{{ p.price | int }}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">per {{ p.unit }}</div>
+              <button onclick="addToCart({{ loop.index }}, this)" class="btn-primary-fw w-100" style="justify-content:center;padding:0.6rem;font-size:0.875rem;">
+                <i class="fas fa-cart-plus"></i> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+let cartCount = 0;
+async function addToCart(id, btn) {
+  const origText = btn.innerHTML;
+  btn.innerHTML = '✓ Added!';
+  btn.style.background = 'var(--success)';
+  cartCount++;
+  // Show cart count notification
+  setTimeout(() => {
+    btn.innerHTML = origText;
+    btn.style.background = '';
+  }, 1500);
+}
+</script>
+{% endblock %}

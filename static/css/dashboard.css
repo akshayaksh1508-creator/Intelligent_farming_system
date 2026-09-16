@@ -1,0 +1,24 @@
+.dashboard-layout { display: flex; min-height: 100vh; background: var(--bg-soft); }
+.sidebar {
+  width: var(--sidebar-w); min-height: 100vh; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-right: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200;
+}
+.sidebar-logo { padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.5); display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1rem; }
+.sidebar-nav { flex: 1; padding: 1rem 0.75rem; overflow-y: auto; }
+.sidebar-section-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); padding: 0.75rem 0.75rem 0.4rem; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.85rem; border-radius: var(--radius-md);
+  color: var(--text-muted); font-size: 0.875rem; font-weight: 500; transition: var(--transition); text-decoration: none; margin-bottom: 0.2rem;
+}
+.sidebar-link:hover, .sidebar-link.active { background: var(--primary-pale); color: var(--primary); font-weight: 600; }
+.sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.5); }
+.dashboard-main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+.topbar {
+  height: 64px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); display: flex; align-items: center; padding: 0 1.5rem; gap: 1rem; position: sticky; top: 0; z-index: 100;
+}
+.dashboard-content { flex: 1; padding: 1.75rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.dash-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+.dash-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.dash-card-title { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+.market-table { width: 100%; border-collapse: collapse; }
+.market-table th, .market-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.875rem; }

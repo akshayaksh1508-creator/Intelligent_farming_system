@@ -1,0 +1,6 @@
+{
+  "mae": 1.958,
+  "r2": 0.9943,
+  "rows": 16200,
+  "note": "Synthetic prototype data only; retrain with real hardware/farm observations before real-world use."
+}

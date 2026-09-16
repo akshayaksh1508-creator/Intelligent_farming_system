@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard – Farm Wise AI{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block chatbot %}{% endblock %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+  <!-- ── Sidebar ───────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">🌾</div>
+      <div class="logo-text">Farm Wise <span>AI</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a href="{{ url_for('dashboard.index') }}" class="sidebar-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-th-large"></i></span> Dashboard
+      </a>
+
+      <div class="sidebar-section-label">AI Tools</div>
+      <a href="{{ url_for('crop.recommendation') }}" class="sidebar-link {% if 'crop' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-seedling"></i></span> Crop Recommendation
+      </a>
+      <a href="{{ url_for('disease.detection') }}" class="sidebar-link {% if 'disease' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-microscope"></i></span> Disease Detection
+      </a>
+      <a href="{{ url_for('weather.index') }}" class="sidebar-link {% if 'weather' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-cloud-sun"></i></span> Weather
+      </a>
+      <a href="{{ url_for('marketplace.index') }}" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-chart-line"></i></span> Market Prices
+      </a>
+
+      <div class="sidebar-section-label">Farm Tools</div>
+      <a href="{{ url_for('crop.recommendation') }}" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-vial"></i></span> Soil Analysis
+      </a>
+      <a href="{{ url_for('marketplace.index') }}" class="sidebar-link {% if 'marketplace' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-store"></i></span> Marketplace
+      </a>
+      <a href="{{ url_for('chatbot.index') }}" class="sidebar-link {% if 'chatbot' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-robot"></i></span> AI Chatbot
+      </a>
+      <a href="{{ url_for('carbon.index') }}" class="sidebar-link {% if 'carbon' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-leaf"></i></span> Carbon Credits
+      </a>
+      <a href="{{ url_for('schemes.index') }}" class="sidebar-link {% if 'schemes' in request.endpoint %}active{% endif %}">
+        <span class="link-icon"><i class="fas fa-landmark"></i></span> Gov Schemes
+      </a>
+
+      <div class="sidebar-section-label">Account</div>
+      <a href="#" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-user-circle"></i></span> Profile
+      </a>
+      <a href="#" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-cog"></i></span> Settings
+      </a>
+      <a href="{{ url_for('main.index') }}" class="sidebar-link">
+        <span class="link-icon"><i class="fas fa-home"></i></span> Back to Home
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">{{ current_user.full_name[0] if current_user.full_name else current_user.username[0] }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ current_user.full_name or current_user.username }}</div>
+          <div class="user-role">{{ current_user.role }} &bull; {{ current_user.state or 'India' }}</div>
+        </div>
+        <a href="{{ url_for('auth.logout') }}" style="color:var(--text-muted);margin-left:auto;" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Dashboard Main ──────────────────────────────────────── -->
+  <main class="dashboard-main">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <button class="sidebar-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="position:static;width:36px;height:36px;font-size:1rem;background:var(--bg-soft);border:1px solid var(--border);border-radius:8px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="topbar-search">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" placeholder="Search anything...">
+      </div>
+
+      <div class="topbar-actions">
+        <button class="topbar-btn" title="Settings"><i class="fas fa-cog"></i></button>
+        <button class="topbar-btn" title="Notifications">
+          <i class="fas fa-bell"></i>
+          <div class="notif-dot"></div>
+        </button>
+        <select class="lang-selector">
+          <option value="en">🌐 EN</option>
+          <option value="hi">हि HI</option>
+          <option value="kn">ಕ KN</option>
+          <option value="ta">த TA</option>
+          <option value="te">తె TE</option>
+        </select>
+        <div class="topbar-user">
+          <div class="avatar-sm">{{ current_user.full_name[0] if current_user.full_name else current_user.username[0] }}</div>
+          <div>
+            <div style="font-size:0.825rem;font-weight:600;">{{ current_user.full_name or current_user.username }}</div>
+            <div style="font-size:0.7rem;color:var(--text-muted);text-transform:capitalize;">{{ current_user.role }}</div>
+          </div>
+          <i class="fas fa-chevron-down" style="font-size:0.7rem;color:var(--text-muted);margin-left:4px;"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+
+      <!-- Page Header -->
+      <div>
+        <h1 class="dash-page-title">Dashboard</h1>
+        <p class="dash-page-subtitle">Welcome back, <strong>{{ current_user.full_name or current_user.username }}</strong>! Here's your farm intelligence overview.</p>
+      </div>
+
+      <!-- ── Top Metric Cards ─────────────────────────────────── -->
+      <div class="row g-3">
+        <!-- Weather Card -->
+        <div class="col-lg-3 col-md-6">
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Today's Weather</span>
+              <div class="dash-card-icon metric-blue">☁️</div>
+            </div>
+            <div style="font-size:2rem;font-weight:900;">{{ weather.temp }}°C</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">{{ weather.condition }}</div>
+            <div style="font-size:0.78rem;color:var(--text-light);margin-top:0.3rem;">
+              H: {{ weather.temp + 4 }}° &nbsp;L: {{ weather.temp - 6 }}°
+            </div>
+          </div>
+        </div>
+
+        <!-- Crop Recommendation Card -->
+        <div class="col-lg-3 col-md-6">
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Crop Recommendation</span>
+              <div class="dash-card-icon metric-green">🌾</div>
+            </div>
+            {% if recent_crops %}
+              <div style="font-size:1.2rem;font-weight:800;color:var(--primary);">{{ recent_crops[0].recommended_crop }}</div>
+              <div class="badge-green d-inline-block mt-1">{{ recent_crops[0].confidence }}% Match</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">Expected Yield: {{ recent_crops[0].expected_yield }} Quintal/acre</div>
+            {% else %}
+              <div style="font-size:0.875rem;color:var(--text-muted);">No recommendations yet</div>
+              <a href="{{ url_for('crop.recommendation') }}" class="btn-primary-fw mt-2" style="padding:0.5rem 1rem;font-size:0.8rem;">Get Recommendation</a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Market Price Card -->
+        <div class="col-lg-3 col-md-6">
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Market Price</span>
+              <div class="dash-card-icon metric-gold">📈</div>
+            </div>
+            {% if prices %}
+              <div style="font-size:1.6rem;font-weight:900;">₹{{ prices[0].price | int }}</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);">{{ prices[0].crop }} / {{ prices[0].unit }}</div>
+              <div class="trend-up mt-1"><i class="fas fa-arrow-up"></i> +{{ prices[0].change_pct | abs }}% vs last week</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- AI Insights Card -->
+        <div class="col-lg-3 col-md-6">
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <span class="dash-card-title">AI Insights</span>
+              <div class="dash-card-icon metric-red">🤖</div>
+            </div>
+            <div style="font-size:2rem;font-weight:900;">{{ stats.ai_insights }}</div>
+            <div style="font-size:0.875rem;color:var(--text-muted);">New Recommendations</div>
+            <a href="{{ url_for('crop.recommendation') }}" style="font-size:0.8rem;color:var(--primary);font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;margin-top:0.5rem;">
+              <i class="fas fa-plus-circle"></i> View All
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Charts Row ───────────────────────────────────────── -->
+      <div class="row g-3">
+        <div class="col-lg-5">
+          <div class="dash-card" style="height:280px;">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Yield Prediction (Quintals)</span>
+            </div>
+            <div class="chart-container" style="height:210px;">
+              <canvas id="yieldChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="dash-card" style="height:280px;">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Profit Forecast (₹)</span>
+            </div>
+            <div class="chart-container" style="height:210px;">
+              <canvas id="profitChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3">
+          <div class="dash-card" style="height:280px;">
+            <div class="dash-card-header">
+              <span class="dash-card-title">Market Trend</span>
+            </div>
+            <div class="chart-container" style="height:210px;">
+              <canvas id="marketTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bottom Row: Prices + Activity ───────────────────── -->
+      <div class="row g-3">
+
+        <!-- Market Prices Table -->
+        <div class="col-lg-7">
+          <div class="dash-card">
+            <div class="dash-card-header mb-3">
+              <span class="dash-card-title">Live Market Prices</span>
+              <a href="{{ url_for('marketplace.index') }}" style="font-size:0.8rem;color:var(--primary);font-weight:600;">View All →</a>
+            </div>
+            <table class="market-table">
+              <thead>
+                <tr>
+                  <th>Crop</th>
+                  <th>Price (₹)</th>
+                  <th>Market</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in prices[:6] %}
+                <tr>
+                  <td><strong>{{ p.crop }}</strong></td>
+                  <td>₹{{ p.price | int }} <small style="color:var(--text-muted);">/{{ p.unit }}</small></td>
+                  <td style="font-size:0.8rem;color:var(--text-muted);">{{ p.market }}</td>
+                  <td>
+                    <span class="{% if p.trend == 'up' %}trend-up{% elif p.trend == 'down' %}trend-down{% else %}trend-stable{% endif %}">
+                      <i class="fas fa-arrow-{% if p.trend == 'up' %}up{% elif p.trend == 'down' %}down{% else %}right{% endif %}"></i>
+                      {{ p.change_pct | abs }}%
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Activity + Quick Access -->
+        <div class="col-lg-5">
+          <div class="dash-card mb-3">
+            <div class="dash-card-header mb-2">
+              <span class="dash-card-title">Recent Activity</span>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--primary);"></div>
+              <div>
+                <div class="activity-text">🔬 Soil analysis completed</div>
+                <div class="activity-time">2 hours ago</div>
+              </div>
+            </div>
+            {% for rec in recent_crops[:2] %}
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--accent);"></div>
+              <div>
+                <div class="activity-text">🌾 Crop recommendation: <strong>{{ rec.recommended_crop }}</strong></div>
+                <div class="activity-time">{{ rec.created_at.strftime('%d %b %Y') }}</div>
+              </div>
+            </div>
+            {% endfor %}
+            {% for det in recent_diseases[:2] %}
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--danger);"></div>
+              <div>
+                <div class="activity-text">🔬 Disease detected: <strong>{{ det.disease_name }}</strong></div>
+                <div class="activity-time">{{ det.created_at.strftime('%d %b %Y') }}</div>
+              </div>
+            </div>
+            {% endfor %}
+            {% if not recent_crops and not recent_diseases %}
+            <div style="text-align:center;padding:1rem;color:var(--text-muted);font-size:0.875rem;">No recent activity. Start using AI tools!</div>
+            {% endif %}
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="dash-card">
+            <div class="dash-card-header mb-3">
+              <span class="dash-card-title">Quick Actions</span>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <a href="{{ url_for('crop.recommendation') }}" class="d-block text-center p-2 rounded" style="background:var(--primary-pale);border:1px solid var(--border-green);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--primary-light)'" onmouseout="this.style.background='var(--primary-pale)'">
+                  <div style="font-size:1.5rem;">🌾</div>
+                  <div style="font-size:0.75rem;font-weight:600;color:var(--primary-dark);">Get Crop Rec.</div>
+                </a>
+              </div>
+              <div class="col-6">
+                <a href="{{ url_for('disease.detection') }}" class="d-block text-center p-2 rounded" style="background:#fff5f5;border:1px solid #fecaca;text-decoration:none;transition:all 0.2s;">
+                  <div style="font-size:1.5rem;">🔬</div>
+                  <div style="font-size:0.75rem;font-weight:600;color:var(--danger);">Check Disease</div>
+                </a>
+              </div>
+              <div class="col-6">
+                <a href="{{ url_for('weather.index') }}" class="d-block text-center p-2 rounded" style="background:#eff6ff;border:1px solid #bfdbfe;text-decoration:none;">
+                  <div style="font-size:1.5rem;">🌤️</div>
+                  <div style="font-size:0.75rem;font-weight:600;color:#1e40af;">View Weather</div>
+                </a>
+              </div>
+              <div class="col-6">
+                <a href="{{ url_for('chatbot.index') }}" class="d-block text-center p-2 rounded" style="background:var(--gold-light);border:1px solid #fcd34d;text-decoration:none;">
+                  <div style="font-size:1.5rem;">🤖</div>
+                  <div style="font-size:0.75rem;font-weight:600;color:#92400e;">Ask AI</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-content -->
+  </main><!-- /dashboard-main -->
+</div><!-- /dashboard-layout -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const chartDefaults = {
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+    y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+  },
+  animation: { duration: 1200 },
+};
+
+// Yield Chart
+new Chart(document.getElementById('yieldChart'), {
+  type: 'line',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      label: 'Yield (Quintals)',
+      data: {{ yield_data | tojson }},
+      borderColor: '#059669',
+      backgroundColor: 'rgba(5,150,105,0.08)',
+      borderWidth: 2.5,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#059669',
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    }]
+  },
+  options: { ...chartDefaults, plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 11 } } } } },
+});
+
+// Profit Chart
+new Chart(document.getElementById('profitChart'), {
+  type: 'bar',
+  data: {
+    labels: MONTHS,
+    datasets: [{
+      label: 'Profit (₹)',
+      data: {{ profit_data | tojson }},
+      backgroundColor: 'rgba(5,150,105,0.7)',
+      borderRadius: 6,
+      borderWidth: 0,
+      hoverBackgroundColor: '#059669',
+    }]
+  },
+  options: chartDefaults,
+});
+
+// Market Trend Chart
+new Chart(document.getElementById('marketTrendChart'), {
+  type: 'line',
+  data: {
+    labels: DAYS,
+    datasets: [{
+      data: {{ market_trend | tojson }},
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245,158,11,0.1)',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#f59e0b',
+    }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' } } } },
+});
+</script>
+{% endblock %}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block meta_description %}Farm Wise AI – AI-Powered Smart Agriculture Platform helping farmers grow smarter with machine learning, weather intelligence, and market insights.{% endblock %}">
+  <title>{% block title %}Farm Wise AI – AI Powered Smart Agriculture{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🌾</text></svg>">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Leaflet -->
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+  <!-- Our CSS -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<!-- ── Navbar ─────────────────────────────────────────────────── -->
+{% block navbar %}
+<nav class="navbar-fw" id="mainNav">
+  <a href="{{ url_for('main.index') }}" class="brand">
+    <div class="logo-icon">🌾</div>
+    <span>Farm Wise <span style="color:var(--primary)">AI</span></span>
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="{{ url_for('main.index') }}" class="{% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
+    <li><a href="{{ url_for('main.index') }}#features">Features</a></li>
+    <li class="nav-item dropdown" style="list-style:none;">
+      <a href="#" class="nav-links-item dropdown-toggle" data-bs-toggle="dropdown" style="padding:0.45rem 0.85rem;border-radius:8px;font-weight:500;font-size:0.9rem;color:var(--text-muted);">AI Solutions <i class="fas fa-chevron-down ms-1" style="font-size:0.7rem;"></i></a>
+      <ul class="dropdown-menu shadow border-0" style="border-radius:14px;padding:0.5rem;">
+        <li><a class="dropdown-item" href="{{ url_for('crop.recommendation') }}" style="border-radius:8px;font-size:0.875rem;"><i class="fas fa-seedling text-success me-2"></i>Crop Recommendation</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('disease.detection') }}" style="border-radius:8px;font-size:0.875rem;"><i class="fas fa-microscope text-danger me-2"></i>Disease Detection</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('weather.index') }}" style="border-radius:8px;font-size:0.875rem;"><i class="fas fa-cloud-sun text-info me-2"></i>Weather Intelligence</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('carbon.index') }}" style="border-radius:8px;font-size:0.875rem;"><i class="fas fa-leaf text-success me-2"></i>Carbon Farming</a></li>
+      </ul>
+    </li>
+    <li><a href="{{ url_for('marketplace.index') }}" class="{% if 'marketplace' in request.endpoint %}active{% endif %}">Marketplace</a></li>
+    <li><a href="{{ url_for('weather.index') }}" class="{% if 'weather' in request.endpoint %}active{% endif %}">Weather</a></li>
+    {% if current_user.is_authenticated %}
+    <li><a href="{{ url_for('dashboard.index') }}" class="{% if 'dashboard' in request.endpoint %}active{% endif %}">Dashboard</a></li>
+    {% endif %}
+    <li><a href="{{ url_for('schemes.index') }}">Schemes</a></li>
+    <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+  </ul>
+
+  <div class="nav-actions">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('dashboard.index') }}" class="btn-ghost-fw">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+      <a href="{{ url_for('auth.logout') }}" class="btn-outline-fw">Logout</a>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}" class="btn-ghost-fw">Login</a>
+      <a href="{{ url_for('auth.register') }}" class="btn-outline-fw" style="padding:0.5rem 1.1rem;">Sign Up</a>
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-fw">Get Started <i class="fas fa-arrow-right"></i></a>
+    {% endif %}
+    <!-- Mobile Menu Toggle -->
+    <button class="btn-ghost-fw d-lg-none" id="mobileMenuBtn" style="padding:0.5rem 0.75rem;">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu Drawer -->
+<div id="mobileMenu" style="display:none;position:fixed;top:72px;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;" onclick="closeMobileMenu()">
+  <div style="background:white;padding:1.5rem;border-bottom:1px solid var(--border);" onclick="event.stopPropagation()">
+    <a href="{{ url_for('main.index') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🏠 Home</a>
+    <a href="{{ url_for('crop.recommendation') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🌾 Crop Recommendation</a>
+    <a href="{{ url_for('disease.detection') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🔬 Disease Detection</a>
+    <a href="{{ url_for('weather.index') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🌤️ Weather</a>
+    <a href="{{ url_for('marketplace.index') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🛒 Marketplace</a>
+    <a href="{{ url_for('schemes.index') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">🏛️ Schemes</a>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('dashboard.index') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--text);font-weight:500;">📊 Dashboard</a>
+    <a href="{{ url_for('auth.logout') }}" class="d-block py-2 px-3" style="border-radius:8px;color:var(--danger);font-weight:500;">Logout</a>
+    {% else %}
+    <div class="d-flex gap-2 mt-2">
+      <a href="{{ url_for('auth.login') }}" class="btn-outline-fw flex-grow-1 text-center">Login</a>
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-fw flex-grow-1 text-center">Sign Up</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+<!-- ── Flash Messages ──────────────────────────────────────────── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div style="position:fixed;top:80px;right:1.5rem;z-index:2000;display:flex;flex-direction:column;gap:0.5rem;max-width:380px;">
+    {% for category, message in messages %}
+    <div class="alert-fw alert-{{ category if category in ['success','danger','warning','info'] else 'info' }}" id="flash-{{ loop.index }}" style="animation:slideUpIn 0.3s ease;box-shadow:var(--shadow-md);">
+      <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+      {{ message }}
+      <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;opacity:0.5;">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  <script>setTimeout(() => document.querySelectorAll('[id^=flash-]').forEach(e=>e.remove()), 5000);</script>
+  {% endif %}
+{% endwith %}
+
+<!-- ── Main Content ────────────────────────────────────────────── -->
+{% block content %}{% endblock %}
+
+<!-- ── AI Chatbot Widget ───────────────────────────────────────── -->
+{% block chatbot %}
+<div class="chatbot-widget">
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🤖</div>
+      <div>
+        <div style="font-weight:700;font-size:0.95rem;">Farm Wise AI</div>
+        <div style="font-size:0.75rem;opacity:0.85;">🟢 Online &bull; Multilingual</div>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-left:auto;">
+        <select id="chatLang" style="background:rgba(255,255,255,0.15);border:none;border-radius:8px;padding:0.2rem 0.5rem;color:white;font-size:0.75rem;cursor:pointer;">
+          <option value="en">EN</option>
+          <option value="hi">हि</option>
+          <option value="kn">ಕ</option>
+          <option value="ta">த</option>
+          <option value="te">తె</option>
+          <option value="mr">म</option>
+        </select>
+        <button onclick="toggleChatbot()" style="background:rgba(255,255,255,0.2);border:none;border-radius:8px;padding:0.2rem 0.5rem;color:white;cursor:pointer;font-size:0.875rem;">✕</button>
+      </div>
+    </div>
+
+    <div class="chatbot-messages" id="chatMessages">
+      <div class="chat-msg bot">
+        👋 Hello! I'm <strong>Farm Wise AI</strong>. Ask me about crop recommendations, disease diagnosis, weather, market prices, or government schemes!
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0 0.5rem;">
+        <button onclick="sendQuick('What crop should I grow?')" class="badge-green" style="cursor:pointer;border:none;padding:0.3rem 0.6rem;border-radius:var(--radius-full);font-size:0.72rem;">🌾 Crop Advice</button>
+        <button onclick="sendQuick('Show market prices')" class="badge-blue" style="cursor:pointer;border:none;padding:0.3rem 0.6rem;border-radius:var(--radius-full);font-size:0.72rem;">📈 Prices</button>
+        <button onclick="sendQuick('Tell me about PM-KISAN')" class="badge-gold" style="cursor:pointer;border:none;padding:0.3rem 0.6rem;border-radius:var(--radius-full);font-size:0.72rem;">🏛️ Schemes</button>
+        <button onclick="sendQuick('Disease treatment')" class="badge-red" style="cursor:pointer;border:none;padding:0.3rem 0.6rem;border-radius:var(--radius-full);font-size:0.72rem;">🔬 Disease</button>
+      </div>
+    </div>
+
+    <div class="chatbot-input-area">
+      <input type="text" class="chatbot-input" id="chatInput" placeholder="Type your farming question..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button class="chatbot-send" onclick="sendMessage()" title="Send">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+
+  <button class="chatbot-toggle" onclick="toggleChatbot()" title="AI Farm Assistant">
+    <div class="pulse-ring"></div>
+    <span id="chatIcon">🌾</span>
+  </button>
+</div>
+{% endblock %}
+
+<!-- ── Footer ──────────────────────────────────────────────────── -->
+{% block footer %}
+<footer class="footer-fw">
+  <div class="container-fw">
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-brand">🌾 Farm Wise AI</div>
+        <p class="footer-desc">Empowering farmers with AI-driven insights, real-time weather data, market intelligence, and smart crop management tools to maximize yield and profit.</p>
+        <div class="social-links">
+          <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-3 col-6">
+        <p class="footer-heading">AI Solutions</p>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('crop.recommendation') }}">Crop Recommendation</a></li>
+          <li><a href="{{ url_for('disease.detection') }}">Disease Detection</a></li>
+          <li><a href="{{ url_for('weather.index') }}">Weather Intel</a></li>
+          <li><a href="{{ url_for('carbon.index') }}">Carbon Farming</a></li>
+          <li><a href="{{ url_for('schemes.index') }}">Gov Schemes</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-3 col-6">
+        <p class="footer-heading">Platform</p>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('marketplace.index') }}">Marketplace</a></li>
+          <li><a href="{{ url_for('chatbot.index') }}">AI Chatbot</a></li>
+          {% if current_user.is_authenticated %}
+          <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+          {% endif %}
+          <li><a href="{{ url_for('main.about') }}">About Us</a></li>
+          <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-12">
+        <p class="footer-heading">Stay Updated</p>
+        <p style="font-size:0.875rem;margin-bottom:1rem;">Get AI farming insights, market alerts, and scheme updates delivered to your inbox.</p>
+        <div class="d-flex gap-2">
+          <input type="email" placeholder="Your email address" style="flex:1;padding:0.65rem 1rem;border-radius:var(--radius-full);border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:white;font-size:0.875rem;outline:none;" onfocus="this.style.borderColor='var(--primary-light)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+          <button class="btn-primary-fw" style="padding:0.65rem 1.25rem;white-space:nowrap;">Subscribe</button>
+        </div>
+        <p style="font-size:0.75rem;margin-top:0.75rem;opacity:0.6;"><i class="fas fa-shield-alt me-1"></i>No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p style="font-size:0.825rem;opacity:0.6;">© {{ current_year }} Farm Wise AI. All rights reserved. Made with ❤️ for Indian Farmers.</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="#" style="font-size:0.8rem;opacity:0.6;color:rgba(255,255,255,0.6);">Privacy Policy</a>
+        <a href="#" style="font-size:0.8rem;opacity:0.6;color:rgba(255,255,255,0.6);">Terms of Service</a>
+        <a href="#" style="font-size:0.8rem;opacity:0.6;color:rgba(255,255,255,0.6);">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+<!-- ── Scripts ─────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ── Navbar Scroll Effect ─────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ── Mobile Menu ───────────────────────────────────────────────
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').style.display = 'none';
+}
+document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+  const m = document.getElementById('mobileMenu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+});
+
+// ── Scroll Animations ─────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 100);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+// ── Counter Animations ────────────────────────────────────────
+function animateCounter(el, target, prefix='', suffix='', duration=2000) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = prefix + Math.floor(start).toLocaleString() + suffix;
+  }, 16);
+}
+
+const statObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.counted) {
+      e.target.dataset.counted = '1';
+      const target = parseInt(e.target.dataset.target);
+      const prefix = e.target.dataset.prefix || '';
+      const suffix = e.target.dataset.suffix || '';
+      animateCounter(e.target, target, prefix, suffix);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => statObserver.observe(el));
+
+// ── Chatbot ───────────────────────────────────────────────────
+function toggleChatbot() {
+  const panel = document.getElementById('chatbotPanel');
+  const icon  = document.getElementById('chatIcon');
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    icon.textContent = '🌾';
+  } else {
+    panel.classList.add('open');
+    icon.textContent = '✕';
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const msg   = input.value.trim();
+  if (!msg) return;
+  const lang  = document.getElementById('chatLang')?.value || 'en';
+  appendChatMsg(msg, 'user');
+  input.value = '';
+
+  const typing = appendChatMsg('...', 'bot');
+  try {
+    const resp = await fetch('/chatbot/api/message', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: msg, language: lang})
+    });
+    const data = await resp.json();
+    typing.textContent = data.response || 'Sorry, I could not process that.';
+  } catch {
+    typing.textContent = 'Connection error. Please try again.';
+  }
+}
+
+function sendQuick(msg) {
+  document.getElementById('chatInput').value = msg;
+  sendMessage();
+}
+
+function appendChatMsg(text, role) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

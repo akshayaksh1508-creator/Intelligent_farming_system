@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – Farm Wise AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/main.css?v=4" rel="stylesheet">
+</head>
+<body style="background:var(--bg-soft);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 0;">
+
+  <div style="width:100%;max-width:500px;padding:1.5rem;">
+    <div class="text-center mb-4">
+      <div class="brand" style="justify-content:center;">
+        <div class="logo-icon">🌾</div>
+        <span style="font-size:1.5rem;font-weight:800;">Farm Wise <span style="color:var(--primary)">AI</span></span>
+      </div>
+      <p style="color:var(--text-muted);margin-top:0.5rem;">Join 100,000+ farmers empowering their yield</p>
+    </div>
+
+    <div class="glass-card" style="padding:2rem;">
+      <div id="alertBox" style="display:none;" class="alert alert-danger"></div>
+
+      <form id="registerForm">
+        <div class="form-group-fw mb-3">
+          <label>Full Name</label>
+          <input type="text" id="full_name" class="form-control-fw" placeholder="Ramesh Kumar" required>
+        </div>
+
+        <div class="form-group-fw mb-3">
+          <label>Username</label>
+          <input type="text" id="username" class="form-control-fw" placeholder="ramesh123" required>
+        </div>
+
+        <div class="form-group-fw mb-3">
+          <label>Email Address</label>
+          <input type="email" id="email" class="form-control-fw" placeholder="ramesh@example.com" required>
+        </div>
+
+        <div class="form-group-fw mb-3">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" class="form-control-fw" placeholder="+91 9876543210">
+        </div>
+
+        <div class="form-group-fw mb-4">
+          <label>Password</label>
+          <input type="password" id="password" class="form-control-fw" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-primary-fw w-100" style="justify-content:center;padding:0.8rem;">
+          Create Free Account <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="text-center mt-3" style="font-size:0.875rem;">
+        Already have an account? <a href="/login.html" style="color:var(--primary);font-weight:600;">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js?v=4"></script>
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const alertBox = document.getElementById("alertBox");
+      alertBox.style.display = "none";
+
+      const full_name = document.getElementById("full_name").value;
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ full_name, username, email, phone, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          window.location.href = "/profile-setup.html";
+        } else {
+          alertBox.textContent = data.error || "Registration failed";
+          alertBox.style.display = "block";
+        }
+      } catch (err) {
+        alertBox.textContent = "Network error";
+        alertBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

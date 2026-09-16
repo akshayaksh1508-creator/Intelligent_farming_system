@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Register – Farm Wise AI{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4 0%,#ffffff 50%,#f0fdf4 100%);padding:5rem 1rem 2rem;">
+  <div style="width:100%;max-width:540px;">
+
+    <div class="text-center mb-4">
+      <a href="{{ url_for('main.index') }}" style="font-size:1.4rem;font-weight:800;color:var(--text);display:inline-flex;align-items:center;gap:0.5rem;margin-bottom:1.5rem;">
+        🌾 Farm Wise AI
+      </a>
+
+      <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:0.5rem;">
+        Create your account 🌱
+      </h1>
+
+      <p style="color:var(--text-muted);font-size:0.925rem;">
+        Join 100,000+ farmers using AI to grow smarter
+      </p>
+    </div>
+
+    <div class="glass-card" style="padding:2.5rem;">
+
+      <form method="POST" action="{{ url_for('auth.register') }}">
+
+        <div class="row g-3 mb-3">
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              name="full_name"
+              class="form-control-fw"
+              placeholder="Ramesh Kumar"
+              required>
+          </div>
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              Username
+            </label>
+
+            <input
+              type="text"
+              name="username"
+              class="form-control-fw"
+              placeholder="ramesh123"
+              required>
+          </div>
+
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            class="form-control-fw"
+            placeholder="ramesh@email.com"
+            required>
+        </div>
+
+        <div class="row g-3 mb-3">
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              Phone Number
+            </label>
+
+            <input
+              type="tel"
+              name="phone"
+              class="form-control-fw"
+              placeholder="+91 98765 43210">
+          </div>
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              State
+            </label>
+
+            <select name="state" class="form-control-fw">
+              <option value="">Select State</option>
+
+              {% for state in ['Andhra Pradesh','Assam','Bihar','Gujarat','Haryana','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Odisha','Punjab','Rajasthan','Tamil Nadu','Telangana','Uttar Pradesh','West Bengal'] %}
+                <option>{{ state }}</option>
+              {% endfor %}
+
+            </select>
+          </div>
+
+        </div>
+
+        <div class="row g-3 mb-4">
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              Password
+            </label>
+
+            <input
+              type="password"
+              name="password"
+              class="form-control-fw"
+              placeholder="Min. 6 characters"
+              required>
+          </div>
+
+          <div class="col-6">
+            <label class="form-label" style="font-size:0.875rem;font-weight:600;">
+              Confirm Password
+            </label>
+
+            <input
+              type="password"
+              name="confirm_password"
+              class="form-control-fw"
+              placeholder="Repeat password"
+              required>
+          </div>
+
+        </div>
+
+        <label style="display:flex;align-items:flex-start;gap:0.6rem;font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem;cursor:pointer;">
+          <input type="checkbox" required style="margin-top:2px;">
+
+          I agree to the
+          <a href="#" style="color:var(--primary);">Terms of Service</a>
+          and
+          <a href="#" style="color:var(--primary);">Privacy Policy</a>
+        </label>
+
+        <button
+          type="submit"
+          class="btn-primary-fw w-100"
+          style="justify-content:center;padding:0.85rem;font-size:1rem;">
+          Create Account 🌾
+        </button>
+
+      </form>
+
+      <div class="text-center mt-4" style="padding-top:1.25rem;border-top:1px solid var(--border);">
+        <p style="font-size:0.875rem;color:var(--text-muted);">
+          Already have an account?
+
+          <a href="{{ url_for('auth.login') }}"
+             style="color:var(--primary);font-weight:700;">
+            Sign in →
+          </a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

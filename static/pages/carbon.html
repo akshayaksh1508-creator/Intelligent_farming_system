@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Farming Advisor – Farm Wise AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="/static/css/main.css?v=4" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar-fw">
+    <a href="/index.html" class="brand">
+      <div class="logo-icon">🌾</div>
+      <span>Farm Wise <span style="color:var(--primary)">AI</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/index.html">Home</a></li>
+      <li><a href="/crop.html">Crop Rec.</a></li>
+      <li><a href="/disease.html">Disease Detection</a></li>
+      <li><a href="/weather.html">Weather</a></li>
+      <li><a href="/marketplace.html">Marketplace</a></li>
+      <li><a href="/schemes.html">Schemes</a></li>
+      <li><a href="/carbon.html" class="active">Carbon Advisor</a></li>
+    </ul>
+    <div class="nav-actions" id="nav-auth-actions">
+      <a href="/login.html" class="btn-ghost-fw">Login</a>
+      <a href="/register.html" class="btn-primary-fw">Get Started</a>
+    </div>
+  </nav>
+
+  <div style="padding-top:var(--navbar-h);min-height:100vh;background:var(--bg-soft);">
+    <div style="background:linear-gradient(135deg,#064e3b,#047857);padding:2.5rem 0;color:white;">
+      <div class="container-fw">
+        <h1 style="font-size:2rem;font-weight:900;">🌿 Carbon Farming Advisor</h1>
+        <p style="opacity:0.9;">Estimate carbon sequestration credits and earn additional income from sustainable practices.</p>
+      </div>
+    </div>
+
+    <div class="container-fw py-4">
+      <div class="row g-4">
+        <!-- Form -->
+        <div class="col-lg-5">
+          <div class="glass-card p-4">
+            <h4 class="font-weight-bold mb-3">🌱 Farm Carbon Calculator</h4>
+            <form id="carbonForm">
+              <div class="mb-3">
+                <label class="form-label">Farm Size (Hectares)</label>
+                <input type="number" id="c_farm_size" class="form-control-fw" value="2.0" step="0.5" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Crop Type</label>
+                <select id="c_crop_type" class="form-control-fw">
+                  <option>Wheat</option>
+                  <option>Rice</option>
+                  <option>Maize</option>
+                  <option>Cotton</option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Sustainable Practice</label>
+                <select id="c_practice" class="form-control-fw">
+                  <option>No-till farming</option>
+                  <option>Cover cropping</option>
+                  <option>Agroforestry</option>
+                  <option>Composting</option>
+                  <option>Biochar application</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn-primary-fw w-100" style="justify-content:center;padding:0.8rem;">
+                <i class="fas fa-leaf"></i> Calculate Carbon Credits
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="col-lg-7">
+          <div id="cPlaceholder" class="glass-card text-center p-5">
+            <div style="font-size:4rem;margin-bottom:1rem;">🌍</div>
+            <h4>Estimate Carbon Earnings</h4>
+            <p style="color:var(--text-muted);">Fill in your farm details to see estimated carbon tonnes captured and payout value.</p>
+          </div>
+
+          <div id="cResult" style="display:none;" class="glass-card p-4">
+            <div class="badge-green mb-2">CARBON ESTIMATE READY</div>
+            <h3 style="font-weight:900;" id="cCaptured">0.8 Tonnes CO2</h3>
+            <p style="color:var(--text-muted);">Estimated annual carbon capture for your farm.</p>
+
+            <div class="row g-3 my-3">
+              <div class="col-6">
+                <div class="p-3 bg-light rounded text-center">
+                  <div style="font-size:0.8rem;color:var(--text-muted);">Carbon Credits</div>
+                  <div style="font-size:1.4rem;font-weight:800;" id="cCredits">0.8 Credits</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 bg-light rounded text-center">
+                  <div style="font-size:0.8rem;color:var(--text-muted);">Est. Payout Value</div>
+                  <div style="font-size:1.4rem;font-weight:800;color:var(--primary);" id="cValue">₹1,200</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3 rounded" style="background:var(--primary-pale);border:1px solid var(--border-green);">
+              <strong style="color:var(--primary-dark);">Selected Practice:</strong>
+              <div id="cPracticeName" style="font-size:0.9rem;">No-till farming</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js?v=4"></script>
+  <script>
+    document.getElementById("carbonForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const body = {
+        farm_size: parseFloat(document.getElementById("c_farm_size").value),
+        crop_type: document.getElementById("c_crop_type").value,
+        practice: document.getElementById("c_practice").value
+      };
+
+      try {
+        const res = await fetch("/api/carbon/calculate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.success) {
+          const r = data.result;
+          document.getElementById("cPlaceholder").style.display = "none";
+          document.getElementById("cResult").style.display = "block";
+
+          document.getElementById("cCaptured").textContent = `${r.carbon_captured} Tonnes CO2`;
+          document.getElementById("cCredits").textContent = `${r.credits_earned} Credits`;
+          document.getElementById("cValue").textContent = `₹${r.estimated_value.toLocaleString()}`;
+          document.getElementById("cPracticeName").textContent = r.practice;
+        }
+      } catch (err) {
+        alert("Error calculating carbon credits");
+      }
+    });
+  </script>
+</body>
+</html>

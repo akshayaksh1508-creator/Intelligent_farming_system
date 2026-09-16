@@ -1,0 +1,31 @@
+{
+  "features": [
+    "day",
+    "soil_ph",
+    "soil_moisture",
+    "nitrogen",
+    "temperature",
+    "rainfall",
+    "fertilizer",
+    "crop_banana",
+    "crop_cotton",
+    "crop_groundnut",
+    "crop_maize",
+    "crop_rice",
+    "crop_soybean",
+    "crop_sugarcane",
+    "crop_tomato",
+    "crop_wheat"
+  ],
+  "supported_crops": [
+    "rice",
+    "wheat",
+    "tomato",
+    "maize",
+    "cotton",
+    "sugarcane",
+    "soybean",
+    "groundnut",
+    "banana"
+  ]
+}

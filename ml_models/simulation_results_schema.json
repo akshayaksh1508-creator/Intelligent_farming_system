@@ -1,0 +1,51 @@
+{
+  "model_name": "Farm Wise AI Crop Simulator (Stage 1 Prototype)",
+  "data_source": "SYNTHETIC/PROTOTYPE DATA",
+  "hardware_compatibility": "Compatible with future ESP32 sensor inputs (pH, moisture, NPK, temp, rain)",
+  "features": [
+    "area_ha",
+    "temperature",
+    "soil_moisture",
+    "soil_ph",
+    "annual_rainfall",
+    "nitrogen",
+    "fertilizer_level",
+    "irrigation_level"
+  ],
+  "crops": [
+    "Banana",
+    "Cotton",
+    "Groundnut",
+    "Maize",
+    "Rice",
+    "Soybean",
+    "Sugarcane",
+    "Tomato",
+    "Wheat"
+  ],
+  "regression_targets": [
+    "yield_t_ha",
+    "water_mm",
+    "harvest_days",
+    "co2_credits",
+    "input_cost",
+    "success_rate"
+  ],
+  "classification_target": "condition",
+  "condition_classes": [
+    "Good",
+    "Moderate",
+    "Poor"
+  ],
+  "configurable_prices_per_tonne": {
+    "Banana": 2500,
+    "Cotton": 66200,
+    "Groundnut": 58500,
+    "Maize": 3035,
+    "Rice": 22000,
+    "Soybean": 46000,
+    "Sugarcane": 3500,
+    "Tomato": 2500,
+    "Wheat": 22750
+  }
+}

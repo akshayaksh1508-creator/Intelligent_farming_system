@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Profile – Farm Wise AI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="/static/css/main.css?v=4" rel="stylesheet">
+</head>
+<body style="background:var(--bg-soft);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;">
+
+  <div class="glass-card" style="width:100%;max-width:600px;padding:2rem;">
+    <div class="text-center mb-4">
+      <div class="logo-icon mx-auto mb-2" style="font-size:2.5rem;">🌾</div>
+      <h3 style="font-weight:800;">Farm Wise <span style="color:var(--primary)">AI</span></h3>
+      <p style="color:var(--primary);font-weight:600;font-size:0.9rem;margin-top:0.5rem;text-transform:uppercase;">Step 2 of 2: Complete Your Profile</p>
+      <p style="color:var(--text-muted);font-size:0.9rem;">Please provide your farm details to submit for admin approval.</p>
+    </div>
+
+    <div id="errorMsg" class="alert alert-danger" style="display:none;"></div>
+
+    <form id="profileForm">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="full_name" class="form-control-fw" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" id="phone" class="form-control-fw" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">State</label>
+          <select id="state" class="form-control-fw" required>
+            <option value="">Select State...</option>
+            <option>Karnataka</option><option>Maharashtra</option><option>Punjab</option>
+            <option>Gujarat</option><option>Tamil Nadu</option><option>Uttar Pradesh</option>
+            <option>Madhya Pradesh</option><option>Rajasthan</option><option>Kerala</option>
+            <option>Andhra Pradesh</option><option>West Bengal</option><option>Bihar</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">District</label>
+          <input type="text" id="district" class="form-control-fw" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Farm Name</label>
+          <input type="text" id="farm_name" class="form-control-fw" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Farm Size (Hectares)</label>
+          <input type="number" step="0.1" id="farm_size" class="form-control-fw" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Primary Crop</label>
+          <select id="primary_crop" class="form-control-fw" required>
+            <option value="">Select Crop...</option>
+            <option>Rice</option><option>Wheat</option><option>Tomato</option>
+            <option>Cotton</option><option>Maize</option><option>Sugarcane</option>
+            <option>Soybean</option><option>Groundnut</option><option>Other</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Aadhaar Number</label>
+          <input type="text" id="aadhaar" pattern="\d{12}" class="form-control-fw" placeholder="12 digit number" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Brief Bio (Optional)</label>
+          <textarea id="bio" class="form-control-fw" rows="3" placeholder="Tell us about your farming experience..."></textarea>
+        </div>
+      </div>
+      
+      <button type="submit" id="submitBtn" class="btn-primary-fw w-100 mt-4" style="justify-content:center;padding:0.8rem;">
+        Complete Profile & Submit for Approval <i class="fas fa-check-circle ms-2"></i>
+      </button>
+    </form>
+  </div>
+
+<script>
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+  btn.disabled = true;
+  document.getElementById('errorMsg').style.display = 'none';
+
+  const body = {
+    full_name: document.getElementById('full_name').value,
+    phone: document.getElementById('phone').value,
+    state: document.getElementById('state').value,
+    district: document.getElementById('district').value,
+    farm_name: document.getElementById('farm_name').value,
+    farm_size: parseFloat(document.getElementById('farm_size').value),
+    primary_crop: document.getElementById('primary_crop').value,
+    aadhaar: document.getElementById('aadhaar').value,
+    bio: document.getElementById('bio').value
+  };
+
+  try {
+    const res = await fetch('/api/auth/complete-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = '/pending-approval.html';
+    } else {
+      document.getElementById('errorMsg').textContent = data.error || 'Submission failed.';
+      document.getElementById('errorMsg').style.display = 'block';
+      btn.innerHTML = 'Complete Profile & Submit for Approval <i class="fas fa-check-circle ms-2"></i>';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    document.getElementById('errorMsg').textContent = 'Network error.';
+    document.getElementById('errorMsg').style.display = 'block';
+    btn.innerHTML = 'Complete Profile & Submit for Approval <i class="fas fa-check-circle ms-2"></i>';
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
