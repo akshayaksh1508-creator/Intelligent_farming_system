@@ -1,4 +1,4 @@
-# Farm Wise AI – AI-Powered Smart Agriculture Platform
+# Intelligent Farming System– AI-Powered Smart Agriculture Platform
 
 A complete full-stack smart agriculture platform built using **Python (Flask)** for backend REST APIs, **HTML5**, **CSS3**, and **Vanilla JavaScript (ES6)** for the frontend (no Jinja template engine syntax).
 
