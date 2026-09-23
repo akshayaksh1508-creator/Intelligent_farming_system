@@ -1,270 +1,271 @@
 {
-  "model_version": "Stage 1 Prototype",
+  "model_version": "Kaggle + ICAR/FAO Retrained",
   "total_dataset_rows": 8100,
-  "note": "Prototype model trained using synthetic data. Real-world accuracy requires real farm/hardware data.",
+  "real_data_rows": 400,
+  "note": "Retrained using Kaggle Crop Recommendation real sensor data for Rice/Maize/Cotton/Banana, with ICAR/FAO calibrated generation for Wheat/Tomato/Sugarcane/Soybean/Groundnut.",
   "crop_metrics": {
     "Banana": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 7.722,
-          "R2": 0.3298
+          "MAE": 0.559,
+          "R2": 0.9877
         },
         "water_mm": {
-          "MAE": 122.525,
-          "R2": 0.3211
+          "MAE": 19.616,
+          "R2": 0.9779
         },
         "harvest_days": {
-          "MAE": 9.584,
-          "R2": 0.1961
+          "MAE": 2.3,
+          "R2": 0.9528
         },
         "co2_credits": {
-          "MAE": 1.869,
-          "R2": 0.7731
+          "MAE": 0.399,
+          "R2": 0.9884
         },
         "input_cost": {
-          "MAE": 1748.794,
-          "R2": 0.9981
+          "MAE": 1359.425,
+          "R2": 0.999
         },
         "success_rate": {
-          "MAE": 24.825,
-          "R2": 0.3284
+          "MAE": 1.328,
+          "R2": 0.9895
         }
       },
-      "condition_accuracy": 0.9556
+      "condition_accuracy": 1.0
     },
     "Cotton": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 0.487,
-          "R2": 0.3966
+          "MAE": 0.023,
+          "R2": 0.9929
         },
         "water_mm": {
-          "MAE": 66.056,
-          "R2": 0.3264
+          "MAE": 12.605,
+          "R2": 0.9306
         },
         "harvest_days": {
-          "MAE": 6.062,
-          "R2": 0.3335
+          "MAE": 1.494,
+          "R2": 0.9448
         },
         "co2_credits": {
-          "MAE": 0.872,
-          "R2": 0.7997
+          "MAE": 0.129,
+          "R2": 0.9899
         },
         "input_cost": {
-          "MAE": 1005.901,
-          "R2": 0.998
+          "MAE": 639.307,
+          "R2": 0.999
         },
         "success_rate": {
-          "MAE": 24.705,
-          "R2": 0.3929
+          "MAE": 1.234,
+          "R2": 0.9922
         }
       },
-      "condition_accuracy": 0.9556
+      "condition_accuracy": 0.9778
     },
     "Groundnut": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 0.519,
-          "R2": 0.3857
+          "MAE": 0.073,
+          "R2": 0.9726
         },
         "water_mm": {
-          "MAE": 43.504,
-          "R2": 0.292
+          "MAE": 7.553,
+          "R2": 0.9756
         },
         "harvest_days": {
-          "MAE": 4.105,
-          "R2": 0.2963
+          "MAE": 1.185,
+          "R2": 0.9341
         },
         "co2_credits": {
-          "MAE": 0.99,
-          "R2": 0.8084
+          "MAE": 0.337,
+          "R2": 0.9681
         },
         "input_cost": {
-          "MAE": 627.087,
-          "R2": 0.9982
+          "MAE": 410.075,
+          "R2": 0.9991
         },
         "success_rate": {
-          "MAE": 23.981,
-          "R2": 0.3886
+          "MAE": 3.22,
+          "R2": 0.97
         }
       },
-      "condition_accuracy": 0.8889
+      "condition_accuracy": 0.9278
     },
     "Maize": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 1.073,
-          "R2": 0.3337
+          "MAE": 0.104,
+          "R2": 0.9817
         },
         "water_mm": {
-          "MAE": 49.284,
-          "R2": 0.2768
+          "MAE": 7.349,
+          "R2": 0.9799
         },
         "harvest_days": {
-          "MAE": 3.571,
-          "R2": 0.169
+          "MAE": 0.872,
+          "R2": 0.9422
         },
         "co2_credits": {
-          "MAE": 1.106,
-          "R2": 0.8109
+          "MAE": 0.291,
+          "R2": 0.9808
         },
         "input_cost": {
-          "MAE": 544.118,
-          "R2": 0.9983
+          "MAE": 434.723,
+          "R2": 0.9987
         },
         "success_rate": {
-          "MAE": 24.372,
-          "R2": 0.3307
+          "MAE": 1.997,
+          "R2": 0.9839
         }
       },
-      "condition_accuracy": 0.9056
+      "condition_accuracy": 0.9944
     },
     "Rice": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 0.887,
-          "R2": 0.3858
+          "MAE": 0.102,
+          "R2": 0.9731
         },
         "water_mm": {
-          "MAE": 93.294,
-          "R2": 0.4632
+          "MAE": 16.83,
+          "R2": 0.9765
         },
         "harvest_days": {
-          "MAE": 4.148,
-          "R2": 0.2919
+          "MAE": 1.178,
+          "R2": 0.9355
         },
         "co2_credits": {
-          "MAE": 1.053,
-          "R2": 0.8719
+          "MAE": 0.372,
+          "R2": 0.973
         },
         "input_cost": {
-          "MAE": 650.493,
-          "R2": 0.998
+          "MAE": 466.11,
+          "R2": 0.9988
         },
         "success_rate": {
-          "MAE": 22.645,
-          "R2": 0.4011
+          "MAE": 2.371,
+          "R2": 0.9734
         }
       },
-      "condition_accuracy": 0.8889
+      "condition_accuracy": 0.9833
     },
     "Soybean": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 0.557,
-          "R2": 0.3767
+          "MAE": 0.107,
+          "R2": 0.9532
         },
         "water_mm": {
-          "MAE": 41.317,
-          "R2": 0.3627
+          "MAE": 7.906,
+          "R2": 0.9781
         },
         "harvest_days": {
-          "MAE": 3.407,
-          "R2": 0.2653
+          "MAE": 0.954,
+          "R2": 0.9388
         },
         "co2_credits": {
-          "MAE": 1.308,
-          "R2": 0.7767
+          "MAE": 0.6,
+          "R2": 0.9497
         },
         "input_cost": {
-          "MAE": 491.571,
-          "R2": 0.9982
+          "MAE": 385.811,
+          "R2": 0.9989
         },
         "success_rate": {
-          "MAE": 23.348,
-          "R2": 0.3783
+          "MAE": 4.198,
+          "R2": 0.9564
         }
       },
-      "condition_accuracy": 0.9222
+      "condition_accuracy": 0.9
     },
     "Sugarcane": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 15.6,
-          "R2": 0.3664
+          "MAE": 2.393,
+          "R2": 0.9721
         },
         "water_mm": {
-          "MAE": 154.251,
-          "R2": 0.3612
+          "MAE": 24.361,
+          "R2": 0.9806
         },
         "harvest_days": {
-          "MAE": 12.426,
-          "R2": 0.2747
+          "MAE": 2.984,
+          "R2": 0.9471
         },
         "co2_credits": {
-          "MAE": 2.541,
-          "R2": 0.7869
+          "MAE": 0.958,
+          "R2": 0.9678
         },
         "input_cost": {
-          "MAE": 1757.04,
-          "R2": 0.9983
+          "MAE": 1421.88,
+          "R2": 0.9989
         },
         "success_rate": {
-          "MAE": 23.965,
-          "R2": 0.3688
+          "MAE": 3.348,
+          "R2": 0.9727
         }
       },
-      "condition_accuracy": 0.9389
+      "condition_accuracy": 0.9556
     },
     "Tomato": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 5.733,
-          "R2": 0.3239
+          "MAE": 0.902,
+          "R2": 0.9667
         },
         "water_mm": {
-          "MAE": 53.873,
-          "R2": 0.292
+          "MAE": 9.918,
+          "R2": 0.967
         },
         "harvest_days": {
-          "MAE": 3.063,
-          "R2": 0.245
+          "MAE": 0.81,
+          "R2": 0.9383
         },
         "co2_credits": {
-          "MAE": 0.772,
-          "R2": 0.8109
+          "MAE": 0.285,
+          "R2": 0.9634
         },
         "input_cost": {
-          "MAE": 1225.406,
-          "R2": 0.9989
+          "MAE": 1193.593,
+          "R2": 0.9987
         },
         "success_rate": {
-          "MAE": 25.576,
-          "R2": 0.3267
+          "MAE": 3.85,
+          "R2": 0.9662
         }
       },
-      "condition_accuracy": 0.95
+      "condition_accuracy": 0.8833
     },
     "Wheat": {
       "regression": {
         "yield_t_ha": {
-          "MAE": 0.86,
-          "R2": 0.368
+          "MAE": 0.135,
+          "R2": 0.9684
         },
         "water_mm": {
-          "MAE": 45.942,
-          "R2": 0.2916
+          "MAE": 6.774,
+          "R2": 0.9827
         },
         "harvest_days": {
-          "MAE": 4.053,
-          "R2": 0.2332
+          "MAE": 0.995,
+          "R2": 0.9545
         },
         "co2_credits": {
-          "MAE": 1.018,
-          "R2": 0.776
+          "MAE": 0.405,
+          "R2": 0.9556
         },
         "input_cost": {
-          "MAE": 550.384,
-          "R2": 0.9978
+          "MAE": 419.863,
+          "R2": 0.999
         },
         "success_rate": {
-          "MAE": 24.91,
-          "R2": 0.3675
+          "MAE": 3.726,
+          "R2": 0.9703
         }
       },
-      "condition_accuracy": 0.9222
+      "condition_accuracy": 0.9
     }
   },
-  "global_yield_r2": 0.846,
-  "global_condition_accuracy": 0.8975
+  "global_yield_r2": 0.9931,
+  "global_condition_accuracy": 0.9519
 }

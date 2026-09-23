@@ -1,7 +1,23 @@
 {
-  "model_name": "Farm Wise AI Crop Simulator (Stage 1 Prototype)",
-  "data_source": "SYNTHETIC/PROTOTYPE DATA",
-  "hardware_compatibility": "Compatible with future ESP32 sensor inputs (pH, moisture, NPK, temp, rain)",
+  "model_name": "Farm Wise AI Crop Simulator (Kaggle + ICAR/FAO Retrained)",
+  "data_sources": {
+    "kaggle_real": "Kaggle Crop Recommendation Dataset - 4 crops with 100 real sensor rows each",
+    "kaggle_augmented": "Gaussian noise augmentation around real Kaggle distributions",
+    "icar_fao_calibrated": "ICAR/FAO calibrated synthetic generation for 5 crops"
+  },
+  "kaggle_crops": [
+    "Rice",
+    "Maize",
+    "Cotton",
+    "Banana"
+  ],
+  "icar_fao_crops": [
+    "Groundnut",
+    "Soybean",
+    "Sugarcane",
+    "Tomato",
+    "Wheat"
+  ],
   "features": [
     "area_ha",
     "temperature",
@@ -47,5 +63,7 @@
     "Sugarcane": 3500,
     "Tomato": 2500,
     "Wheat": 22750
-  }
+  },
+  "total_dataset_rows": 8100,
+  "real_data_rows": 400
 }

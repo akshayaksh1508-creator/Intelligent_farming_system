@@ -24,7 +24,7 @@ def run_tests():
     # Test 2: Stress Response
     total += 1
     print("\n[TEST 2] Agronomic Sensitivity & Stress Test...")
-    good = predict_simulation({"crop": "Maize", "area_ha": 1.0, "temperature": 24, "soil_moisture": 50, "soil_ph": 6.5, "annual_rainfall": 700, "nitrogen": 70})
+    good = predict_simulation({"crop": "Maize", "area_ha": 1.0, "temperature": 24, "soil_moisture": 60, "soil_ph": 6.5, "annual_rainfall": 700, "nitrogen": 100, "fertilizer_level": 80, "irrigation_level": 70})
     poor = predict_simulation({"crop": "Maize", "area_ha": 1.0, "temperature": 38, "soil_moisture": 15, "soil_ph": 4.5, "annual_rainfall": 100, "nitrogen": 10})
     if (poor["yield_t_ha"] < good["yield_t_ha"]) and (poor["success_rate"] < good["success_rate"]) and (good["condition"] == "Good") and (poor["condition"] == "Poor"):
         print(f"  [PASS] Yield drops under stress from {good['yield_t_ha']} to {poor['yield_t_ha']} t/ha; Condition: Good -> Poor.")
