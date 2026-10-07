@@ -64,6 +64,16 @@
                   <option value="Rice">Rice</option>
                   <option value="Wheat">Wheat</option>
                   <option value="Cotton">Cotton</option>
+                  <option value="Corn">Corn / Maize</option>
+                  <option value="Potato">Potato</option>
+                  <option value="Sugarcane">Sugarcane</option>
+                  <option value="Apple">Apple</option>
+                  <option value="Grape">Grape</option>
+                  <option value="Citrus">Citrus</option>
+                  <option value="Peach">Peach</option>
+                  <option value="Cherry">Cherry</option>
+                  <option value="Strawberry">Strawberry</option>
+                  <option value="Pepper">Pepper</option>
                 </select>
               </div>
 
@@ -83,9 +93,14 @@
           </div>
 
           <div id="diseaseResult" style="display:none;" class="glass-card p-4">
-            <div class="badge-red mb-2" id="disSeverity">HIGH SEVERITY</div>
-            <h2 id="disName" style="font-size:2.2rem;font-weight:900;color:#dc2626;">Tomato Late Blight</h2>
-            <div class="mb-3">AI Confidence: <strong id="disConfidence">94%</strong></div>
+            <div class="badge-red mb-2" id="disSeverity" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;color:white;font-weight:700;font-size:0.85rem;">HIGH SEVERITY</div>
+            <h2 id="disName" style="font-size:2rem;font-weight:900;color:#dc2626;margin:0.5rem 0;">Tomato Late Blight</h2>
+            <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.5rem;" id="disPlantType">Plant: Tomato</div>
+            <div class="mb-3">AI Confidence: <strong id="disConfidence" style="font-size:1.1rem;">94%</strong></div>
+
+            <!-- Low confidence warning (shown when model is unsure) -->
+            <div id="disLowConfWarn" style="display:none;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#92400e;"></div>
+
 
             <div class="p-3 bg-light rounded mb-3">
               <strong>⚠️ Symptoms:</strong>
@@ -135,6 +150,10 @@
       const fileInput = document.getElementById("plant_image");
       if (!fileInput.files[0]) return;
 
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
       const formData = new FormData();
       formData.append("plant_image", fileInput.files[0]);
       formData.append("plant_type", document.getElementById("plant_type").value);
@@ -151,17 +170,43 @@
           document.getElementById("diseaseResult").style.display = "block";
 
           document.getElementById("disName").textContent = r.disease_name;
-          document.getElementById("disConfidence").textContent = r.confidence + "%";
+          document.getElementById("disPlantType").textContent = "Plant: " + r.plant_type;
+
+          const confEl = document.getElementById("disConfidence");
+          confEl.textContent = r.confidence + "%";
+          confEl.style.color = r.confidence >= 75 ? "#16a34a" : r.confidence >= 50 ? "#d97706" : "#dc2626";
+
+          // Low-confidence warning
+          const warnEl = document.getElementById("disLowConfWarn");
+          if (r.confidence < 50) {
+            warnEl.style.display = "block";
+            warnEl.textContent = "⚠️ Low confidence (" + r.confidence + "%). Please upload a clearer, well-lit photo of the affected leaf for better accuracy.";
+          } else {
+            warnEl.style.display = "none";
+          }
+
           document.getElementById("disSeverity").textContent = r.severity.toUpperCase() + " SEVERITY";
+          // Color the severity badge
+          const sevEl = document.getElementById("disSeverity");
+          sevEl.style.background = r.severity === "Very High" ? "#7f1d1d" :
+                                   r.severity === "High" ? "#dc2626" :
+                                   r.severity === "None" ? "#16a34a" : "#d97706";
+
           document.getElementById("disSymptoms").textContent = r.symptoms;
           document.getElementById("disMedicine").textContent = r.medicine;
           document.getElementById("disOrganic").textContent = r.organic_solution;
           document.getElementById("disPrevention").textContent = r.preventive_measures;
+        } else {
+          alert("Analysis failed: " + (data.error || "Unknown error"));
         }
       } catch (err) {
-        alert("Error analyzing image");
+        alert("Network error. Please check your connection and try again.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-microscope"></i> Diagnose Disease';
       }
     });
   </script>
 </body>
 </html>
+
