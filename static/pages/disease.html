@@ -1,212 +1,767 @@
+<!-- static/pages/disease.html -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disease Detection – Farm Wise AI</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="/static/css/main.css?v=4" rel="stylesheet">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Disease Detection – Farm Wise AI</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <link href="/static/css/main.css?v=4" rel="stylesheet">
+
 </head>
+
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar-fw">
-    <a href="/index.html" class="brand">
-      <div class="logo-icon">🌾</div>
-      <span>Farm Wise <span style="color:var(--primary)">AI</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="/index.html">Home</a></li>
-      <li><a href="/crop.html">Crop Rec.</a></li>
-      <li><a href="/disease.html" class="active">Disease Detection</a></li>
-      <li><a href="/weather.html">Weather</a></li>
-      <li><a href="/marketplace.html">Marketplace</a></li>
-      <li><a href="/schemes.html">Schemes</a></li>
-      <li><a href="/carbon.html">Carbon Advisor</a></li>
-    </ul>
-    <div class="nav-actions" id="nav-auth-actions">
-      <a href="/login.html" class="btn-ghost-fw">Login</a>
-      <a href="/register.html" class="btn-primary-fw">Get Started</a>
-    </div>
-  </nav>
+    <!-- Navbar -->
 
-  <div style="padding-top:var(--navbar-h);min-height:100vh;background:var(--bg-soft);">
-    <div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);padding:3rem 0;color:white;">
-      <div class="container-fw">
-        <h1 style="font-size:2rem;font-weight:900;">🔬 Plant Disease Detection</h1>
-        <p style="opacity:0.9;">Upload a photo of an affected plant leaf to receive immediate AI diagnosis and treatment.</p>
-      </div>
-    </div>
+    <nav class="navbar-fw">
 
-    <div class="container-fw py-4">
-      <div class="row g-4">
-        <!-- Upload Form -->
-        <div class="col-lg-5">
-          <div class="glass-card p-4">
-            <h4 class="font-weight-bold mb-3">📷 Upload Plant Photo</h4>
-            <form id="diseaseForm">
-              <div class="upload-zone text-center p-4" onclick="document.getElementById('plant_image').click()" style="border:2px dashed var(--border);border-radius:16px;cursor:pointer;">
-                <div style="font-size:3rem;">📸</div>
-                <h6>Click or Drag Image Here</h6>
-                <small style="color:var(--text-muted);">PNG, JPG, WEBP</small>
-                <input type="file" id="plant_image" name="plant_image" accept="image/*" style="display:none;" required onchange="previewImg(this)">
-              </div>
+        <a href="/index.html" class="brand">
 
-              <div id="imgPreviewBox" class="text-center mt-3" style="display:none;">
-                <img id="imgPreview" style="max-height:180px;border-radius:12px;" alt="Preview">
-              </div>
+            <div class="logo-icon">🌾</div>
 
-              <div class="mt-3">
-                <label class="form-label">Plant Type (Optional)</label>
-                <select id="plant_type" class="form-control-fw">
-                  <option value="Tomato">Tomato</option>
-                  <option value="Rice">Rice</option>
-                  <option value="Wheat">Wheat</option>
-                  <option value="Cotton">Cotton</option>
-                  <option value="Corn">Corn / Maize</option>
-                  <option value="Potato">Potato</option>
-                  <option value="Sugarcane">Sugarcane</option>
-                  <option value="Apple">Apple</option>
-                  <option value="Grape">Grape</option>
-                  <option value="Citrus">Citrus</option>
-                  <option value="Peach">Peach</option>
-                  <option value="Cherry">Cherry</option>
-                  <option value="Strawberry">Strawberry</option>
-                  <option value="Pepper">Pepper</option>
-                </select>
-              </div>
+            <span>
+                Farm Wise
+                <span style="color:var(--primary)">AI</span>
+            </span>
 
-              <button type="submit" class="btn-primary-fw w-100 mt-4" style="justify-content:center;padding:0.8rem;background:linear-gradient(135deg,#dc2626,#b91c1c);">
-                <i class="fas fa-microscope"></i> Diagnose Disease
-              </button>
-            </form>
-          </div>
+        </a>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="/index.html">Home</a>
+            </li>
+
+            <li>
+                <a href="/crop.html">Crop Rec.</a>
+            </li>
+
+            <li>
+                <a href="/disease.html" class="active">
+                    Disease Detection
+                </a>
+            </li>
+
+            <li>
+                <a href="/weather.html">Weather</a>
+            </li>
+
+            <li>
+                <a href="/marketplace.html">Marketplace</a>
+            </li>
+
+            <li>
+                <a href="/schemes.html">Schemes</a>
+            </li>
+
+            <li>
+                <a href="/carbon.html">Carbon Advisor</a>
+            </li>
+
+        </ul>
+
+        <div class="nav-actions" id="nav-auth-actions">
+
+            <a href="/login.html" class="btn-ghost-fw">
+                Login
+            </a>
+
+            <a href="/register.html" class="btn-primary-fw">
+                Get Started
+            </a>
+
         </div>
 
-        <!-- Result Box -->
-        <div class="col-lg-7">
-          <div id="diseasePlaceholder" class="glass-card text-center p-5">
-            <div style="font-size:4rem;margin-bottom:1rem;">🔬</div>
-            <h4>AI Disease Scanner</h4>
-            <p style="color:var(--text-muted);">Upload a clear photo of the diseased leaf to view symptoms and medicine guidance.</p>
-          </div>
-
-          <div id="diseaseResult" style="display:none;" class="glass-card p-4">
-            <div class="badge-red mb-2" id="disSeverity" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:6px;color:white;font-weight:700;font-size:0.85rem;">HIGH SEVERITY</div>
-            <h2 id="disName" style="font-size:2rem;font-weight:900;color:#dc2626;margin:0.5rem 0;">Tomato Late Blight</h2>
-            <div style="color:var(--text-muted);font-size:0.9rem;margin-bottom:0.5rem;" id="disPlantType">Plant: Tomato</div>
-            <div class="mb-3">AI Confidence: <strong id="disConfidence" style="font-size:1.1rem;">94%</strong></div>
-
-            <!-- Low confidence warning (shown when model is unsure) -->
-            <div id="disLowConfWarn" style="display:none;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#92400e;"></div>
+    </nav>
 
 
-            <div class="p-3 bg-light rounded mb-3">
-              <strong>⚠️ Symptoms:</strong>
-              <div id="disSymptoms" style="font-size:0.9rem;color:var(--text-muted);">Dark lesions on leaves...</div>
+    <div
+        style="
+            padding-top:var(--navbar-h);
+            min-height:100vh;
+            background:var(--bg-soft);
+        "
+    >
+
+        <div
+            style="
+                background:linear-gradient(135deg,#7f1d1d,#dc2626);
+                padding:3rem 0;
+                color:white;
+            "
+        >
+
+            <div class="container-fw">
+
+                <h1 style="font-size:2rem;font-weight:900;">
+                    🔬 Plant Disease Detection
+                </h1>
+
+                <p style="opacity:0.9;">
+                    Upload a photo of an affected plant leaf to receive
+                    immediate AI diagnosis and treatment.
+                </p>
+
             </div>
 
-            <div class="row g-3 mb-3">
-              <div class="col-6">
-                <div class="p-3 rounded" style="background:#fff5f5;border:1px solid #fecaca;">
-                  <strong style="color:#b91c1c;">💊 Recommended Medicine:</strong>
-                  <div id="disMedicine" style="font-size:0.85rem;" class="mt-1">Mancozeb 75WP</div>
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="p-3 rounded" style="background:var(--primary-pale);border:1px solid var(--border-green);">
-                  <strong style="color:var(--primary-dark);">🌿 Organic Solution:</strong>
-                  <div id="disOrganic" style="font-size:0.85rem;" class="mt-1">Neem oil spray</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-3 rounded bg-light">
-              <strong>🛡️ Prevention:</strong>
-              <div id="disPrevention" style="font-size:0.85rem;color:var(--text-muted);" class="mt-1">Ensure proper air circulation.</div>
-            </div>
-          </div>
         </div>
-      </div>
+
+
+        <div class="container-fw py-4">
+
+            <div class="row g-4">
+
+                <!-- Upload Form -->
+
+                <div class="col-lg-5">
+
+                    <div class="glass-card p-4">
+
+                        <h4 class="font-weight-bold mb-3">
+                            📷 Upload Plant Photo
+                        </h4>
+
+                        <form id="diseaseForm">
+
+                            <div
+                                class="upload-zone text-center p-4"
+                                onclick="document.getElementById('plant_image').click()"
+                                style="
+                                    border:2px dashed var(--border);
+                                    border-radius:16px;
+                                    cursor:pointer;
+                                "
+                            >
+
+                                <div style="font-size:3rem;">
+                                    📸
+                                </div>
+
+                                <h6>
+                                    Click or Drag Image Here
+                                </h6>
+
+                                <small style="color:var(--text-muted);">
+                                    PNG, JPG, WEBP
+                                </small>
+
+                                <input
+                                    type="file"
+                                    id="plant_image"
+                                    name="plant_image"
+                                    accept="image/*"
+                                    style="display:none;"
+                                    required
+                                    onchange="previewImg(this)"
+                                >
+
+                            </div>
+
+
+                            <div
+                                id="imgPreviewBox"
+                                class="text-center mt-3"
+                                style="display:none;"
+                            >
+
+                                <img
+                                    id="imgPreview"
+                                    style="
+                                        max-height:180px;
+                                        border-radius:12px;
+                                    "
+                                    alt="Preview"
+                                >
+
+                            </div>
+
+
+                            <div class="mt-3">
+
+                                <label class="form-label">
+                                    Plant Type (Optional)
+                                </label>
+
+                                <select
+                                    id="plant_type"
+                                    class="form-control-fw"
+                                >
+
+                                    <!-- Exact crops supported by the CNN -->
+
+                                    <option value="Tomato">
+                                        Tomato
+                                    </option>
+
+                                    <option value="Rice">
+                                        Rice / Paddy
+                                    </option>
+
+                                    <option value="Wheat">
+                                        Wheat
+                                    </option>
+
+                                    <option value="Cotton">
+                                        Cotton
+                                    </option>
+
+                                    <option value="Maize">
+                                        Maize
+                                    </option>
+
+                                    <option value="Potato">
+                                        Potato
+                                    </option>
+
+                                    <option value="Sugarcane">
+                                        Sugarcane
+                                    </option>
+
+                                    <option value="Banana">
+                                        Banana
+                                    </option>
+
+                                    <option value="Chilli">
+                                        Chilli
+                                    </option>
+
+                                    <option value="Grape">
+                                        Grape
+                                    </option>
+
+                                    <option value="Groundnut">
+                                        Groundnut
+                                    </option>
+
+                                    <option value="Mango">
+                                        Mango
+                                    </option>
+
+                                    <option value="Okra">
+                                        Okra
+                                    </option>
+
+                                    <option value="Pea">
+                                        Pea
+                                    </option>
+
+                                    <option value="Pigeon Pea">
+                                        Pigeon Pea
+                                    </option>
+
+                                    <option value="Pomegranate">
+                                        Pomegranate
+                                    </option>
+
+                                    <option value="Soybean">
+                                        Soybean
+                                    </option>
+
+                                    <option value="Turmeric">
+                                        Turmeric
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="btn-primary-fw w-100 mt-4"
+                                style="
+                                    justify-content:center;
+                                    padding:0.8rem;
+                                    background:linear-gradient(
+                                        135deg,
+                                        #dc2626,
+                                        #b91c1c
+                                    );
+                                "
+                            >
+
+                                <i class="fas fa-microscope"></i>
+                                Diagnose Disease
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Result Box -->
+
+                <div class="col-lg-7">
+
+                    <div
+                        id="diseasePlaceholder"
+                        class="glass-card text-center p-5"
+                    >
+
+                        <div
+                            style="
+                                font-size:4rem;
+                                margin-bottom:1rem;
+                            "
+                        >
+                            🔬
+                        </div>
+
+                        <h4>
+                            AI Disease Scanner
+                        </h4>
+
+                        <p style="color:var(--text-muted);">
+                            Upload a clear photo of the diseased leaf
+                            to view symptoms and medicine guidance.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        id="diseaseResult"
+                        style="display:none;"
+                        class="glass-card p-4"
+                    >
+
+                        <div
+                            class="badge-red mb-2"
+                            id="disSeverity"
+                            style="
+                                display:inline-block;
+                                padding:0.3rem 0.8rem;
+                                border-radius:6px;
+                                color:white;
+                                font-weight:700;
+                                font-size:0.85rem;
+                            "
+                        >
+                            HIGH SEVERITY
+                        </div>
+
+
+                        <h2
+                            id="disName"
+                            style="
+                                font-size:2rem;
+                                font-weight:900;
+                                color:#dc2626;
+                                margin:0.5rem 0;
+                            "
+                        >
+                            Tomato Late Blight
+                        </h2>
+
+
+                        <div
+                            style="
+                                color:var(--text-muted);
+                                font-size:0.9rem;
+                                margin-bottom:0.5rem;
+                            "
+                            id="disPlantType"
+                        >
+                            Plant: Tomato
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            AI Confidence:
+
+                            <strong
+                                id="disConfidence"
+                                style="font-size:1.1rem;"
+                            >
+                                94%
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Low confidence warning -->
+
+                        <div
+                            id="disLowConfWarn"
+                            style="
+                                display:none;
+                                background:#fef3c7;
+                                border:1px solid #fbbf24;
+                                border-radius:8px;
+                                padding:0.75rem 1rem;
+                                margin-bottom:1rem;
+                                font-size:0.88rem;
+                                color:#92400e;
+                            "
+                        >
+                        </div>
+
+
+                        <div class="p-3 bg-light rounded mb-3">
+
+                            <strong>
+                                ⚠️ Symptoms:
+                            </strong>
+
+                            <div
+                                id="disSymptoms"
+                                style="
+                                    font-size:0.9rem;
+                                    color:var(--text-muted);
+                                "
+                            >
+                                Dark lesions on leaves...
+                            </div>
+
+                        </div>
+
+
+                        <div class="row g-3 mb-3">
+
+                            <div class="col-6">
+
+                                <div
+                                    class="p-3 rounded"
+                                    style="
+                                        background:#fff5f5;
+                                        border:1px solid #fecaca;
+                                    "
+                                >
+
+                                    <strong
+                                        style="color:#b91c1c;"
+                                    >
+                                        💊 Recommended Medicine:
+                                    </strong>
+
+                                    <div
+                                        id="disMedicine"
+                                        style="font-size:0.85rem;"
+                                        class="mt-1"
+                                    >
+                                        Mancozeb 75WP
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-6">
+
+                                <div
+                                    class="p-3 rounded"
+                                    style="
+                                        background:var(--primary-pale);
+                                        border:1px solid var(--border-green);
+                                    "
+                                >
+
+                                    <strong
+                                        style="color:var(--primary-dark);"
+                                    >
+                                        🌿 Organic Solution:
+                                    </strong>
+
+                                    <div
+                                        id="disOrganic"
+                                        style="font-size:0.85rem;"
+                                        class="mt-1"
+                                    >
+                                        Neem oil spray
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="p-3 rounded bg-light">
+
+                            <strong>
+                                🛡️ Prevention:
+                            </strong>
+
+                            <div
+                                id="disPrevention"
+                                style="
+                                    font-size:0.85rem;
+                                    color:var(--text-muted);
+                                "
+                                class="mt-1"
+                            >
+                                Ensure proper air circulation.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-  </div>
 
-  <script src="/static/js/main.js?v=4"></script>
-  <script>
-    function previewImg(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          document.getElementById('imgPreview').src = e.target.result;
-          document.getElementById('imgPreviewBox').style.display = 'block';
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
 
-    document.getElementById("diseaseForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById("plant_image");
-      if (!fileInput.files[0]) return;
+    <script src="/static/js/main.js?v=4"></script>
 
-      const btn = e.target.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    <script>
 
-      const formData = new FormData();
-      formData.append("plant_image", fileInput.files[0]);
-      formData.append("plant_type", document.getElementById("plant_type").value);
+        function previewImg(input) {
 
-      try {
-        const res = await fetch("/api/disease/analyze", {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        if (data.success) {
-          const r = data.result;
-          document.getElementById("diseasePlaceholder").style.display = "none";
-          document.getElementById("diseaseResult").style.display = "block";
+            if (input.files && input.files[0]) {
 
-          document.getElementById("disName").textContent = r.disease_name;
-          document.getElementById("disPlantType").textContent = "Plant: " + r.plant_type;
+                const reader = new FileReader();
 
-          const confEl = document.getElementById("disConfidence");
-          confEl.textContent = r.confidence + "%";
-          confEl.style.color = r.confidence >= 75 ? "#16a34a" : r.confidence >= 50 ? "#d97706" : "#dc2626";
+                reader.onload = e => {
 
-          // Low-confidence warning
-          const warnEl = document.getElementById("disLowConfWarn");
-          if (r.confidence < 50) {
-            warnEl.style.display = "block";
-            warnEl.textContent = "⚠️ Low confidence (" + r.confidence + "%). Please upload a clearer, well-lit photo of the affected leaf for better accuracy.";
-          } else {
-            warnEl.style.display = "none";
-          }
+                    document.getElementById("imgPreview").src =
+                        e.target.result;
 
-          document.getElementById("disSeverity").textContent = r.severity.toUpperCase() + " SEVERITY";
-          // Color the severity badge
-          const sevEl = document.getElementById("disSeverity");
-          sevEl.style.background = r.severity === "Very High" ? "#7f1d1d" :
-                                   r.severity === "High" ? "#dc2626" :
-                                   r.severity === "None" ? "#16a34a" : "#d97706";
+                    document.getElementById("imgPreviewBox").style.display =
+                        "block";
 
-          document.getElementById("disSymptoms").textContent = r.symptoms;
-          document.getElementById("disMedicine").textContent = r.medicine;
-          document.getElementById("disOrganic").textContent = r.organic_solution;
-          document.getElementById("disPrevention").textContent = r.preventive_measures;
-        } else {
-          alert("Analysis failed: " + (data.error || "Unknown error"));
+                };
+
+                reader.readAsDataURL(input.files[0]);
+
+            }
+
         }
-      } catch (err) {
-        alert("Network error. Please check your connection and try again.");
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-microscope"></i> Diagnose Disease';
-      }
-    });
-  </script>
-</body>
-</html>
 
+
+        document
+            .getElementById("diseaseForm")
+            .addEventListener("submit", async (e) => {
+
+                e.preventDefault();
+
+
+                const fileInput =
+                    document.getElementById("plant_image");
+
+
+                if (!fileInput.files[0]) {
+                    return;
+                }
+
+
+                const btn =
+                    e.target.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                btn.disabled = true;
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+
+                const formData = new FormData();
+
+
+                formData.append(
+                    "plant_image",
+                    fileInput.files[0]
+                );
+
+
+                formData.append(
+                    "plant_type",
+                    document.getElementById("plant_type").value
+                );
+
+
+                try {
+
+                    const res = await fetch(
+                        "/api/disease/analyze",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                    const data = await res.json();
+
+
+                    if (data.success) {
+
+                        const r = data.result;
+
+
+                        document.getElementById(
+                            "diseasePlaceholder"
+                        ).style.display = "none";
+
+
+                        document.getElementById(
+                            "diseaseResult"
+                        ).style.display = "block";
+
+
+                        document.getElementById(
+                            "disName"
+                        ).textContent =
+                            r.disease_name;
+
+
+                        document.getElementById(
+                            "disPlantType"
+                        ).textContent =
+                            "Plant: " + r.plant_type;
+
+
+                        const confEl =
+                            document.getElementById(
+                                "disConfidence"
+                            );
+
+
+                        confEl.textContent =
+                            r.confidence + "%";
+
+
+                        confEl.style.color =
+                            r.confidence >= 75
+                                ? "#16a34a"
+                                : r.confidence >= 50
+                                    ? "#d97706"
+                                    : "#dc2626";
+
+
+                        // Low-confidence warning
+
+                        const warnEl =
+                            document.getElementById(
+                                "disLowConfWarn"
+                            );
+
+
+                        if (r.confidence < 50) {
+
+                            warnEl.style.display = "block";
+
+                            warnEl.textContent =
+                                "⚠️ Low confidence (" +
+                                r.confidence +
+                                "%). Please upload a clearer, well-lit photo of the affected leaf for better accuracy.";
+
+                        } else {
+
+                            warnEl.style.display = "none";
+
+                        }
+
+
+                        document.getElementById(
+                            "disSeverity"
+                        ).textContent =
+                            r.severity.toUpperCase() +
+                            " SEVERITY";
+
+
+                        // Color the severity badge
+
+                        const sevEl =
+                            document.getElementById(
+                                "disSeverity"
+                            );
+
+
+                        sevEl.style.background =
+                            r.severity === "Very High"
+                                ? "#7f1d1d"
+                                : r.severity === "High"
+                                    ? "#dc2626"
+                                    : r.severity === "None"
+                                        ? "#16a34a"
+                                        : "#d97706";
+
+
+                        document.getElementById(
+                            "disSymptoms"
+                        ).textContent =
+                            r.symptoms;
+
+
+                        document.getElementById(
+                            "disMedicine"
+                        ).textContent =
+                            r.medicine;
+
+
+                        document.getElementById(
+                            "disOrganic"
+                        ).textContent =
+                            r.organic_solution;
+
+
+                        document.getElementById(
+                            "disPrevention"
+                        ).textContent =
+                            r.preventive_measures;
+
+
+                    } else {
+
+                        alert(
+                            "Analysis failed: " +
+                            (data.error || "Unknown error")
+                        );
+
+                    }
+
+
+                } catch (err) {
+
+                    console.error(err);
+
+                    alert(
+                        "Network error. Please check your connection and try again."
+                    );
+
+
+                } finally {
+
+                    btn.disabled = false;
+
+                    btn.innerHTML =
+                        '<i class="fas fa-microscope"></i> Diagnose Disease';
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>

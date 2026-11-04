@@ -9,3 +9,8 @@ __pycache__/
 # Intelligent Farming System - Disease Detection
 disease_dataset/
 disease_detection/cache/
+
+# Local SQLite database
+instance/farmwise.db
+
+static/uploads/
