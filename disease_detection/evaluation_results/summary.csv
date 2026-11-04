@@ -1,0 +1,3 @@
+split,samples,accuracy
+validation,9550,0.9099476439790576
+test,9550,0.9129842931937173
