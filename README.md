@@ -27,6 +27,7 @@ Designed with a modern SaaS UI matching the premium Emerald Green & White glassm
 - **Frontend**: Pure HTML5, CSS3 (Glassmorphism, Inter typography), Vanilla JavaScript ES6 (Fetch API)
 - **Database**: SQLite (SQLAlchemy ORM)
 - **Machine Learning**: Scikit-Learn (Random Forest Classifier), OpenCV, Pillow
+- **Hardware IoT**: ESP32 telemetry over Wi-Fi, capacitive soil-moisture sensor, DHT11/DHT22
 
 ---
 
@@ -44,6 +45,23 @@ python app.py
 
 Then open your browser and visit:
 **http://127.0.0.1:5000**
+
+## 🔌 ESP32 Sensor Connection
+
+The active dashboard reads the latest ESP32 values automatically. The device code is in
+`hardware/esp32_farmwise.ino` and the wiring/setup steps are in `hardware/README.md`.
+
+Set the same device token for Flask and the ESP32 before starting the server:
+
+```powershell
+$env:ESP32_DEVICE_TOKEN = "use-a-long-random-token"
+python app.py
+```
+
+The ESP32 sends readings to `POST /api/hardware/telemetry`. The website polls
+`GET /api/hardware/latest`, and the simulator uses live soil moisture, humidity, and
+temperature when the latest reading is less than two minutes old. pH, nitrogen, and
+rainfall still use documented defaults because those sensors are not connected yet.
 
 ---
 

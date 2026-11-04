@@ -5,6 +5,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory, session
 
 from config import config
+<<<<<<< Updated upstream
 
 from models import (
     db,
@@ -15,6 +16,9 @@ from models import (
     CarbonCredit
 )
 
+=======
+from models import db, User, CropRecommendation, DiseaseDetection, Product, CarbonCredit, HardwareReading
+>>>>>>> Stashed changes
 from ml_models.crop_model import get_crop_model
 
 from disease_detection.cnn_inference import predict_uploaded_image
@@ -1106,6 +1110,154 @@ def create_app(env="development"):
 
         db.session.commit()
 
+<<<<<<< Updated upstream
+=======
+        return jsonify({"success": True, "result": res})
+
+    # Disease Detection API
+    @app.route("/api/disease/analyze", methods=["POST"])
+    def api_disease_analyze():
+        if "plant_image" not in request.files:
+            return jsonify({"success": False, "error": "No image file uploaded"}), 400
+        file = request.files["plant_image"]
+        image_bytes = file.read()
+        plant_type = request.form.get("plant_type", "Tomato")
+
+        model = get_disease_model()
+        res = model.predict(image_bytes, plant_type)
+
+        filename = f"disease_{file.filename}"
+        user_id = session.get("user_id")
+        detection = DiseaseDetection(
+            user_id=user_id,
+            image_path=filename,
+            plant_type=res["plant_type"],
+            disease_name=res["disease_name"],
+            confidence=res["confidence"],
+            symptoms=res["symptoms"],
+            treatment=res["treatment"],
+            medicine=res["medicine"],
+            organic_solution=res["organic_solution"],
+            preventive_measures=res["preventive_measures"],
+            is_healthy=res["is_healthy"]
+        )
+        db.session.add(detection)
+        db.session.commit()
+
+        return jsonify({"success": True, "result": res})
+
+    # Weather API
+    @app.route("/api/weather", methods=["GET"])
+    def api_weather():
+        location = request.args.get("location", "New Delhi")
+        return jsonify(get_weather(location))
+
+    # ESP32 hardware telemetry APIs
+    @app.route("/api/hardware/telemetry", methods=["POST"])
+    def api_hardware_telemetry():
+        expected_token = app.config.get("ESP32_DEVICE_TOKEN", "")
+        supplied_token = request.headers.get("X-Device-Token", "")
+        if expected_token and supplied_token != expected_token:
+            return jsonify({"success": False, "error": "Invalid device token"}), 401
+
+        data = request.get_json(silent=True) or {}
+        try:
+            device_id = str(data.get("device_id", "esp32-farm-01")).strip()[:100]
+            soil_moisture = float(data["soil_moisture"])
+            humidity = float(data["humidity"])
+            temperature = data.get("temperature")
+            temperature = None if temperature is None else float(temperature)
+        except (KeyError, TypeError, ValueError):
+            return jsonify({"success": False, "error": "device_id, soil_moisture and humidity are required numeric values"}), 400
+
+        if not device_id or not 0 <= soil_moisture <= 100 or not 0 <= humidity <= 100:
+            return jsonify({"success": False, "error": "soil_moisture and humidity must be between 0 and 100"}), 400
+        if temperature is not None and not -50 <= temperature <= 80:
+            return jsonify({"success": False, "error": "temperature is outside the valid range"}), 400
+
+        reading = HardwareReading(
+            device_id=device_id,
+            soil_moisture=soil_moisture,
+            humidity=humidity,
+            temperature=temperature,
+        )
+        db.session.add(reading)
+        db.session.commit()
+        return jsonify({"success": True, "reading": reading.to_dict(age_seconds=0)})
+
+    @app.route("/api/hardware/latest", methods=["GET"])
+    def api_hardware_latest():
+        reading = HardwareReading.query.order_by(HardwareReading.received_at.desc()).first()
+        if not reading:
+            return jsonify({"connected": False, "reading": None})
+        age = max(0, int((datetime.utcnow() - reading.received_at).total_seconds()))
+        connected = age <= app.config.get("HARDWARE_STALE_SECONDS", 120)
+        return jsonify({"connected": connected, "reading": reading.to_dict(connected, age)})
+
+    # Marketplace API
+    @app.route("/api/marketplace/products", methods=["GET"])
+    def api_products():
+        category = request.args.get("category", "all")
+        query = Product.query
+        if category != "all":
+            query = query.filter_by(category=category)
+        products = [p.to_dict() for p in query.all()]
+        return jsonify(products)
+
+    # Chatbot API
+    @app.route("/api/chatbot/message", methods=["POST"])
+    def api_chatbot():
+        data = request.get_json() or {}
+        msg = data.get("message", "").lower()
+
+        if "crop" in msg or "grow" in msg or "sow" in msg:
+            resp = "🌾 For AI crop recommendations, visit the Crop Recommendation tool! You can input your soil NPK levels, temperature, and season for exact predictions."
+        elif "disease" in msg or "sick" in msg or "leaf" in msg:
+            resp = "🔬 You can upload an image of your plant on the Disease Detection page to diagnose diseases and receive immediate organic and chemical treatments."
+        elif "weather" in msg or "rain" in msg:
+            resp = "🌤️ Currently in New Delhi: 34°C, partly cloudy with 25% rain probability. Check the Weather tab for full 7-day forecasts!"
+        elif "price" in msg or "rate" in msg or "market" in msg:
+            resp = "📈 Today's top market rates: Tomato ₹2,450/q, Rice ₹2,183/q, Wheat ₹2,275/q, Cotton ₹6,620/q."
+        elif "scheme" in msg or "government" in msg or "pm-kisan" in msg:
+            resp = "🏛️ Key Scheme: PM-KISAN provides ₹6,000/year direct support to farmer families. PMFBY offers comprehensive crop insurance!"
+        else:
+            resp = "🤖 Hello! I am Farm Wise AI Assistant. I can assist you with Crop Recommendations, Disease Diagnosis, Weather Forecasts, Market Prices, and Government Schemes."
+
+        return jsonify({"response": resp})
+
+    # Carbon API
+    @app.route("/api/carbon/calculate", methods=["POST"])
+    def api_carbon_calculate():
+        data = request.get_json() or {}
+        farm_size = float(data.get("farm_size", 1.0))
+        crop_type = data.get("crop_type", "Wheat")
+        practice = data.get("practice", "No-till farming")
+
+        factors = {
+            "No-till farming": 0.4,
+            "Cover cropping": 0.3,
+            "Agroforestry": 1.5,
+            "Composting": 0.2,
+            "Biochar application": 0.8
+        }
+        factor = factors.get(practice, 0.3)
+        carbon_captured = round(farm_size * factor, 2)
+        credits_earned = carbon_captured
+        estimated_value = int(credits_earned * 1500)
+
+        user_id = session.get("user_id")
+        rec = CarbonCredit(
+            user_id=user_id,
+            farm_size=farm_size,
+            crop_type=crop_type,
+            practice=practice,
+            carbon_captured=carbon_captured,
+            credits_earned=credits_earned,
+            estimated_value=estimated_value
+        )
+        db.session.add(rec)
+        db.session.commit()
+>>>>>>> Stashed changes
 
         return jsonify({
             "success": True,

@@ -290,9 +290,25 @@ class DiseasePredictionModel:
         return augmented
 
     def predict(self, image_bytes, plant_type=None):
-        """Main prediction routine for leaf image uploads — uses CNN with TTA."""
-        # 1. Try PyTorch Deep Learning inference with Test-Time Augmentation
+        """
+        Main prediction pipeline (in priority order):
+          0. Gemini Vision API  — expert-level accuracy, real-world robust (needs GEMINI_API_KEY)
+          1. CNN + TTA          — local MobileNetV3 with 7-view augmentation (needs GPU/CPU)
+          2. Heuristic fallback — simple green-ratio colour check
+        """
+        # ── 0. GEMINI VISION API (primary, most accurate) ─────────────────
+        try:
+            from ml_models.gemini_disease_service import analyze_with_gemini, is_gemini_available
+            if is_gemini_available():
+                gemini_result = analyze_with_gemini(image_bytes, plant_type)
+                if gemini_result:
+                    return gemini_result
+        except Exception as e:
+            print(f"[Gemini] Skipped: {e}")
+
+        # ── 1. CNN + TTA (fallback when Gemini unavailable) ───────────────
         if self.pytorch_model is not None:
+
             try:
                 import torch
                 raw_img = Image.open(io.BytesIO(image_bytes)).convert("RGB")

@@ -196,3 +196,26 @@ class CarbonCredit(db.Model):
             "estimated_value": self.estimated_value,
             "created_at": self.created_at.strftime("%Y-%m-%d"),
         }
+
+
+class HardwareReading(db.Model):
+    """Latest readings received from an ESP32 farm sensor device."""
+    __tablename__ = "hardware_readings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    device_id = db.Column(db.String(100), nullable=False, index=True)
+    soil_moisture = db.Column(db.Float, nullable=False)
+    humidity = db.Column(db.Float, nullable=False)
+    temperature = db.Column(db.Float, nullable=True)
+    received_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    def to_dict(self, is_connected=True, age_seconds=None):
+        return {
+            "device_id": self.device_id,
+            "soil_moisture": self.soil_moisture,
+            "humidity": self.humidity,
+            "temperature": self.temperature,
+            "received_at": self.received_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "age_seconds": age_seconds,
+            "connected": is_connected,
+        }

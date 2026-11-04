@@ -14,7 +14,11 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
     WEATHER_API_KEY = os.environ.get("WEATHER_API_KEY", "your_weatherapi_key_here")
     WEATHER_API_BASE = "http://api.weatherapi.com/v1"
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")  # Google Gemini Vision API key for disease detection
+    ESP32_DEVICE_TOKEN = os.environ.get("ESP32_DEVICE_TOKEN", "change-this-device-token")
+    HARDWARE_STALE_SECONDS = int(os.environ.get("HARDWARE_STALE_SECONDS", "120"))
     APP_NAME = "Farm Wise AI"
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
