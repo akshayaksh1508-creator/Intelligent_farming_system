@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "Farm Wise AI",
+    "slug": "farm-wise-ai-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#059669"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.farmwiseai.mobile"
+    },
+    "android": {
+      "package": "com.farmwiseai.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#059669",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Farm Wise AI needs access to your photos to analyze plant leaves for diseases.",
+          "cameraPermission": "Farm Wise AI uses the camera to photograph plant leaves for disease detection."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "react-native-fast-tflite",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Farm Wise AI uses your location to show local weather, crop prices and crop recommendations."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "16e7657a-ae0a-4d44-9078-05c7d6a765ca"
+      }
+    }
+  }
+}

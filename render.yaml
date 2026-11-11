@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: farm-wise-ai
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: DATA_GOV_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ESP32_DEVICE_TOKEN
+        sync: false
+      - key: WEATHER_API_KEY
+        sync: false
