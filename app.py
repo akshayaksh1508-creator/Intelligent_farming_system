@@ -1,17 +1,25 @@
 import os
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory, session
+from flask_cors import CORS
 from config import config
-from models import db, User, CropRecommendation, DiseaseDetection, Product, CarbonCredit
+from models import db, User, CropRecommendation, DiseaseDetection, Product, CarbonCredit, HardwareReading
 from ml_models.crop_model import get_crop_model
-from disease_detection.cnn_inference import predict_uploaded_image
+try:
+    from disease_detection.cnn_inference import predict_uploaded_image
+except ImportError:
+    # PyTorch isn't installed on free hosted deployments (e.g. Render);
+    # the disease API falls back to the agronomic heuristic engine.
+    predict_uploaded_image = None
 from services.weather_service import get_weather
 from services.market_service import get_market_prices
+from services.geo_service import reverse_geocode
 from routes.simulation import simulation_bp
 
 def create_app(env="development"):
     app = Flask(__name__, static_folder="static", static_url_path="/static")
     app.config.from_object(config[env])
+    CORS(app, supports_credentials=True)
 
     os.makedirs(os.path.join(app.root_path, "static", "uploads"), exist_ok=True)
     os.makedirs(os.path.join(app.root_path, "instance"), exist_ok=True)
@@ -258,8 +266,16 @@ def create_app(env="development"):
     @app.route("/api/dashboard/stats", methods=["GET"])
     def api_dashboard_stats():
         user_id = session.get("user_id")
-        weather = get_weather("New Delhi")
-        prices = get_market_prices()
+        lat = request.args.get("lat", type=float)
+        lon = request.args.get("lon", type=float)
+        geo = reverse_geocode(lat, lon) if (lat is not None and lon is not None) else None
+        state = (geo or {}).get("region") or None
+        weather = (
+            get_weather((geo or {}).get("city") or "", lat=lat, lon=lon)
+            if lat is not None and lon is not None
+            else get_weather("New Delhi")
+        )
+        prices = get_market_prices(state=state)
 
         recent_recs = []
         recent_diseases = []
@@ -322,6 +338,115 @@ def create_app(env="development"):
 
         return jsonify({"success": True, "result": res})
 
+    # Automatic Crop Recommendation API (no manual inputs)
+    @app.route("/api/crop/auto", methods=["GET"])
+    def api_crop_auto():
+        now = datetime.utcnow()
+        lat = request.args.get("lat", type=float)
+        lon = request.args.get("lon", type=float)
+        geo = reverse_geocode(lat, lon) if (lat is not None and lon is not None) else None
+        month = now.month
+        if 6 <= month <= 10:
+            season = "Kharif"
+            season_rainfall = 200.0
+        elif month in (4, 5):
+            season = "Zaid"
+            season_rainfall = 40.0
+        else:
+            season = "Rabi"
+            season_rainfall = 60.0
+
+        sources = {}
+
+        def record(name, value, source, note, unit=""):
+            sources[name] = {"value": value, "source": source, "note": note, "unit": unit}
+            return value
+
+        temperature, humidity = 28.0, 65.0
+        sensor_connected = False
+        reading = HardwareReading.query.order_by(HardwareReading.received_at.desc()).first()
+        if reading:
+            age = (now - reading.received_at).total_seconds()
+            if age <= app.config.get("HARDWARE_STALE_SECONDS", 120):
+                sensor_connected = True
+                sensor_label = f"ESP32 sensor ({reading.device_id})"
+                record("soil_moisture", round(reading.soil_moisture, 1), sensor_label,
+                       "sensor value (not used by the crop model)", "%")
+                if reading.temperature is not None:
+                    temperature = record("temperature", round(reading.temperature, 1),
+                                         sensor_label, "live farm sensor reading", "°C")
+                humidity = record("humidity", round(reading.humidity, 1),
+                                  sensor_label, "live farm sensor reading", "%")
+
+        try:
+            weather = (
+                get_weather((geo or {}).get("city") or "", lat=lat, lon=lon)
+                if lat is not None and lon is not None
+                else get_weather("New Delhi")
+            )
+            weather_label = f"Weather service ({weather.get('location', '')})".strip()
+            if "temperature" not in sources:
+                temperature = record("temperature", round(float(weather.get("temp", temperature)), 1),
+                                     weather_label, "sensor offline — weather fallback", "°C")
+            if "humidity" not in sources:
+                humidity = record("humidity", round(float(weather.get("humidity", humidity)), 1),
+                                  weather_label, "sensor offline — weather fallback", "%")
+        except Exception:
+            pass
+
+        if "temperature" not in sources:
+            record("temperature", temperature, "Default", "no sensor or weather data available", "°C")
+        if "humidity" not in sources:
+            record("humidity", humidity, "Default", "no sensor or weather data available", "%")
+
+        nitrogen = record("nitrogen", 80.0, "Soil-test default",
+                          "connect an NPK sensor or use a soil test for exact values", "kg/ha")
+        phosphorus = record("phosphorus", 60.0, "Soil-test default",
+                            "connect an NPK sensor or use a soil test for exact values", "kg/ha")
+        potassium = record("potassium", 40.0, "Soil-test default",
+                           "connect an NPK sensor or use a soil test for exact values", "kg/ha")
+        ph = record("ph", 6.5, "Soil-test default",
+                    "connect a pH sensor or use a soil test for exact values", "")
+        rainfall = record("rainfall", float(season_rainfall), "Seasonal average",
+                          f"typical {season} rainfall", "mm")
+        soil_type = record("soil_type", "Loamy", "Default", "most common Indian farmland soil", "")
+        record("season", season, "Auto (calendar)", f"current month: {now.strftime('%B')}", "")
+        land_area = record("land_area", 1.0, "Default", "update your farm size in your profile", "hectare")
+
+        model = get_crop_model()
+        res = model.predict(nitrogen, phosphorus, potassium, ph, temperature, humidity,
+                            rainfall, soil_type, season, land_area)
+
+        user_id = session.get("user_id")
+        rec = CropRecommendation(
+            user_id=user_id,
+            state=(geo or {}).get("region") or "Karnataka",
+            district=(geo or {}).get("city") or "Bangalore",
+            season=season,
+            soil_type=soil_type,
+            land_area=land_area,
+            nitrogen=nitrogen, phosphorus=phosphorus, potassium=potassium, ph=ph,
+            temperature=temperature, humidity=humidity, rainfall=rainfall,
+            recommended_crop=res["recommended_crop"],
+            confidence=res["confidence"],
+            expected_yield=res["expected_yield"],
+            expected_profit=res["expected_profit"],
+            fertilizer=res["fertilizer"],
+            water_requirement=res["water_requirement"],
+            harvest_time=res["harvest_time"],
+            alternative_crops=", ".join(res["alternative_crops"])
+        )
+        db.session.add(rec)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "result": res,
+            "sources": sources,
+            "sensor_connected": sensor_connected,
+            "season": season,
+        })
+
     # Disease Detection API
     @app.route("/api/disease/analyze", methods=["POST"])
     def api_disease_analyze():
@@ -331,7 +456,16 @@ def create_app(env="development"):
         image_bytes = file.read()
         plant_type = request.form.get("plant_type", "Tomato")
 
-        res = predict_uploaded_image(image_bytes, plant_type)
+        if predict_uploaded_image is None:
+            from ml_models.disease_model import get_disease_model
+            res = get_disease_model().predict(image_bytes, plant_type=plant_type)
+        else:
+            try:
+                res = predict_uploaded_image(image_bytes, plant_type)
+            except (ValueError, FileNotFoundError) as e:
+                print(f"[Disease] CNN prediction skipped ({e}); using fallback engine.")
+                from ml_models.disease_model import get_disease_model
+                res = get_disease_model().predict(image_bytes, plant_type=plant_type)
 
         filename = f"disease_{file.filename}"
         user_id = session.get("user_id")
@@ -356,8 +490,58 @@ def create_app(env="development"):
     # Weather API
     @app.route("/api/weather", methods=["GET"])
     def api_weather():
-        location = request.args.get("location", "New Delhi")
-        return jsonify(get_weather(location))
+        lat = request.args.get("lat", type=float)
+        lon = request.args.get("lon", type=float)
+        location = request.args.get("location", "")
+        if lat is not None and lon is not None:
+            return jsonify(get_weather(location, lat=lat, lon=lon))
+        return jsonify(get_weather(location or "New Delhi"))
+
+    # ESP32 hardware telemetry APIs
+    @app.route("/api/hardware/telemetry", methods=["POST"])
+    def api_hardware_telemetry():
+        expected_token = app.config.get("ESP32_DEVICE_TOKEN", "")
+        supplied_token = request.headers.get("X-Device-Token", "")
+        if supplied_token != expected_token:
+            return jsonify({"success": False, "error": "Invalid device token"}), 401
+
+        data = request.get_json(silent=True) or {}
+        try:
+            device_id = str(data.get("device_id", "esp32-unknown")).strip() or "esp32-unknown"
+            soil_moisture = float(data["soil_moisture"])
+            humidity = float(data["humidity"])
+        except (KeyError, TypeError, ValueError):
+            return jsonify({"success": False, "error": "soil_moisture and humidity numbers are required"}), 400
+
+        temperature = None
+        if data.get("temperature") is not None:
+            try:
+                temperature = float(data["temperature"])
+            except (TypeError, ValueError):
+                temperature = None
+
+        reading = HardwareReading(
+            device_id=device_id,
+            soil_moisture=soil_moisture,
+            humidity=humidity,
+            temperature=temperature,
+        )
+        db.session.add(reading)
+        db.session.commit()
+
+        return jsonify({"success": True})
+
+    @app.route("/api/hardware/latest", methods=["GET"])
+    def api_hardware_latest():
+        reading = HardwareReading.query.order_by(HardwareReading.received_at.desc()).first()
+        if not reading:
+            return jsonify({"connected": False, "reading": None})
+        age = (datetime.utcnow() - reading.received_at).total_seconds()
+        stale = age > app.config.get("HARDWARE_STALE_SECONDS", 120)
+        return jsonify({
+            "connected": not stale,
+            "reading": reading.to_dict(is_connected=not stale, age_seconds=round(age, 1)),
+        })
 
     # Marketplace API
     @app.route("/api/marketplace/products", methods=["GET"])

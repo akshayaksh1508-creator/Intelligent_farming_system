@@ -8,6 +8,7 @@ import torch.nn as nn
 from PIL import Image, ImageOps
 
 from ml_models.disease_model import get_agronomic_advisory
+from ml_models.gemini_disease_service import generate_disease_advisory
 
 
 # ============================================================
@@ -358,7 +359,7 @@ def predict_uploaded_image(image_bytes, crop_name):
     the existing disease-detection frontend.
     """
 
-    crop_name = crop_name.strip().lower()
+    crop_name = CROP_ALIASES.get(crop_name.strip().lower(), crop_name.strip().lower())
 
 
     if crop_name not in crop_to_index:
@@ -417,9 +418,22 @@ def predict_uploaded_image(image_bytes, crop_name):
         )
 
 
-        advisory = get_agronomic_advisory(
-            class_name
-        )
+        is_healthy = prediction["disease"].lower() == "healthy"
+
+
+        # The CNN decides the disease; the AI generates real, researched
+        # treatment information for it. Falls back to the built-in agronomic
+        # database when no API key is configured or the API call fails.
+        advisory = None
+        if not is_healthy:
+            advisory = generate_disease_advisory(
+                class_name,
+                prediction["confidence"]
+            )
+        if advisory is None:
+            advisory = get_agronomic_advisory(
+                class_name
+            )
 
 
         # ----------------------------------------------------
@@ -451,6 +465,11 @@ def predict_uploaded_image(image_bytes, crop_name):
             "is_healthy": (
                 prediction["disease"].lower()
                 == "healthy"
+            ),
+
+            "diagnosis_source": advisory.get(
+                "diagnosis_source",
+                "cnn_agronomic"
             )
         }
 

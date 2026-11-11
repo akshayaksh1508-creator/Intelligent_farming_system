@@ -158,34 +158,23 @@
         </div>
 
         <div class="row g-4">
-          <!-- Form -->
+          <!-- Auto Data Panel -->
           <div class="col-lg-5">
             <div class="glass-card p-4">
-              <h5 style="font-weight:700;margin-bottom:1.25rem;">🧪 Farm Parameters</h5>
-              <form id="cropForm">
-                <div class="row g-3">
-                  <div class="col-6"><label class="form-label">State</label>
-                    <select id="crop_state" class="form-control-fw"><option>Karnataka</option><option>Maharashtra</option><option>Punjab</option><option>Gujarat</option><option>Tamil Nadu</option><option>Uttar Pradesh</option></select></div>
-                  <div class="col-6"><label class="form-label">Season</label>
-                    <select id="crop_season" class="form-control-fw"><option>Kharif</option><option>Rabi</option><option>Zaid</option><option>Annual</option></select></div>
-                  <div class="col-6"><label class="form-label">Soil Type</label>
-                    <select id="crop_soil" class="form-control-fw"><option>Loamy</option><option>Sandy Loam</option><option>Clayey</option><option>Black</option><option>Red</option><option>Clay Loam</option></select></div>
-                  <div class="col-6"><label class="form-label">Land Area (Ha)</label>
-                    <input type="number" id="crop_land" class="form-control-fw" value="1.0" step="0.1"></div>
-
-                  <div class="col-12"><p style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:0.5rem 0 0;">Soil Nutrients (kg/ha)</p></div>
-                  <div class="col-4"><label class="form-label">Nitrogen</label><input type="number" id="crop_n" class="form-control-fw" value="80"></div>
-                  <div class="col-4"><label class="form-label">Phosphorus</label><input type="number" id="crop_p" class="form-control-fw" value="60"></div>
-                  <div class="col-4"><label class="form-label">Potassium</label><input type="number" id="crop_k" class="form-control-fw" value="40"></div>
-
-                  <div class="col-12"><p style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin:0.5rem 0 0;">Climate</p></div>
-                  <div class="col-6"><label class="form-label">Soil pH</label><input type="number" id="crop_ph" class="form-control-fw" value="6.5" step="0.1"></div>
-                  <div class="col-6"><label class="form-label">Temp (°C)</label><input type="number" id="crop_temp" class="form-control-fw" value="28"></div>
-                  <div class="col-6"><label class="form-label">Humidity (%)</label><input type="number" id="crop_hum" class="form-control-fw" value="65"></div>
-                  <div class="col-6"><label class="form-label">Rainfall (mm)</label><input type="number" id="crop_rain" class="form-control-fw" value="80"></div>
-                </div>
-                <button type="submit" id="cropSubmitBtn" class="btn-primary-fw w-100 mt-3" style="justify-content:center;padding:0.8rem;"><i class="fas fa-brain"></i> Get AI Recommendation</button>
-              </form>
+              <h5 style="font-weight:700;margin-bottom:1.25rem;">🛰️ Auto-Collected Farm Data</h5>
+              <div id="cropSensorBadge" class="badge-green w-100 mb-3" style="justify-content:center;padding:0.6rem;">
+                <i class="fas fa-satellite-dish me-2"></i>Checking ESP32 sensor...
+              </div>
+              <table class="table table-sm mb-0" id="cropSourcesTable">
+                <thead>
+                  <tr><th>Parameter</th><th>Value</th><th>Source</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="3" class="text-center text-muted">Loading...</td></tr>
+                </tbody>
+              </table>
+              <button type="button" id="cropRefreshBtn" class="btn-primary-fw w-100 mt-3" style="justify-content:center;padding:0.8rem;"><i class="fas fa-brain"></i> Get AI Recommendation</button>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin:0.75rem 0 0;">No manual inputs needed — values come from your ESP32 sensor, live weather, and seasonal defaults.</p>
             </div>
           </div>
 
@@ -194,7 +183,7 @@
             <div id="cropPlaceholder" class="glass-card text-center p-5">
               <div style="font-size:4rem;">🌾</div>
               <h4 style="font-weight:800;margin-top:0.5rem;">Ready for Analysis</h4>
-              <p style="color:var(--text-muted);">Fill in farm parameters and click "Get AI Recommendation".</p>
+              <p style="color:var(--text-muted);">Values are collected automatically from your sensors and weather — click "Get AI Recommendation".</p>
             </div>
             <div id="cropResult" style="display:none;">
               <div class="result-card mb-3">
@@ -1126,41 +1115,71 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) { console.error(err); }
 });
 
-/* ── Crop Recommendation ───────────────────────────────── */
-document.getElementById("cropForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById("cropSubmitBtn");
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...'; btn.disabled = true;
-  const body = {
-    state: document.getElementById("crop_state").value,
-    season: document.getElementById("crop_season").value,
-    soil_type: document.getElementById("crop_soil").value,
-    land_area: parseFloat(document.getElementById("crop_land").value),
-    nitrogen: parseFloat(document.getElementById("crop_n").value),
-    phosphorus: parseFloat(document.getElementById("crop_p").value),
-    potassium: parseFloat(document.getElementById("crop_k").value),
-    ph: parseFloat(document.getElementById("crop_ph").value),
-    temperature: parseFloat(document.getElementById("crop_temp").value),
-    humidity: parseFloat(document.getElementById("crop_hum").value),
-    rainfall: parseFloat(document.getElementById("crop_rain").value),
-  };
+/* ── Crop Recommendation (auto — no manual inputs) ─────── */
+const CROP_SOURCE_LABELS = {
+  temperature: "Temperature", humidity: "Humidity", rainfall: "Rainfall",
+  nitrogen: "Nitrogen (N)", phosphorus: "Phosphorus (P)", potassium: "Potassium (K)",
+  ph: "Soil pH", soil_type: "Soil Type", season: "Season", land_area: "Land Area",
+  soil_moisture: "Soil Moisture (info)"
+};
+const CROP_SOURCE_ORDER = ["temperature", "humidity", "rainfall", "nitrogen", "phosphorus",
+  "potassium", "ph", "soil_type", "season", "land_area", "soil_moisture"];
+
+function cropFmtValue(v) {
+  return typeof v === "number" ? String(Math.round(v * 10) / 10) : v;
+}
+
+function cropSourceBadge(source) {
+  if (source.startsWith("ESP32")) return `<span class="badge-green">🟢 ${source}</span>`;
+  if (source.startsWith("Weather")) return `<span class="badge-blue">🌤️ ${source}</span>`;
+  if (source.startsWith("Auto")) return `<span class="badge-blue">📅 ${source}</span>`;
+  return `<span class="badge-muted">${source}</span>`;
+}
+
+async function loadAutoCrop() {
+  const btn = document.getElementById("cropRefreshBtn");
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Collecting data...'; btn.disabled = true;
   try {
-    const res = await fetch("/api/crop/predict", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify(body) });
+    const res = await fetch("/api/crop/auto");
     const data = await res.json();
-    if (data.success) {
-      const r = data.result;
-      document.getElementById("cropPlaceholder").style.display = "none";
-      document.getElementById("cropResult").style.display = "block";
-      document.getElementById("recCrop").textContent = r.recommended_crop;
-      document.getElementById("recConf").textContent = r.confidence + "%";
-      document.getElementById("recYield").textContent = r.expected_yield + " Quintals";
-      document.getElementById("recProfit").textContent = "₹" + r.expected_profit.toLocaleString();
-      document.getElementById("recFert").textContent = r.fertilizer;
-      document.getElementById("recAlts").innerHTML = r.alternative_crops.map(c => `<span class="badge-green me-1">${c}</span>`).join("");
+    if (!data.success) { alert(data.error || "Prediction error"); return; }
+
+    const badge = document.getElementById("cropSensorBadge");
+    if (data.sensor_connected) {
+      badge.innerHTML = '<i class="fas fa-satellite-dish me-2"></i>ESP32 sensor connected — live sensor values in use';
+    } else {
+      badge.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>ESP32 offline — using weather & seasonal defaults';
     }
-  } catch (err) { alert("Prediction error"); }
+    badge.style.background = data.sensor_connected ? "" : "rgba(217,119,6,0.15)";
+    badge.style.color = data.sensor_connected ? "" : "#b45309";
+
+    const keys = CROP_SOURCE_ORDER.filter(k => data.sources[k]);
+    document.querySelector("#cropSourcesTable tbody").innerHTML = keys.map(k => {
+      const s = data.sources[k];
+      return `<tr>
+        <td style="font-weight:600;">${CROP_SOURCE_LABELS[k] || k}</td>
+        <td>${cropFmtValue(s.value)}${s.unit ? " " + s.unit : ""}</td>
+        <td>${cropSourceBadge(s.source)}</td>
+      </tr>`;
+    }).join("");
+
+    const r = data.result;
+    document.getElementById("cropPlaceholder").style.display = "none";
+    document.getElementById("cropResult").style.display = "block";
+    document.getElementById("recCrop").textContent = r.recommended_crop;
+    document.getElementById("recConf").textContent = r.confidence + "%";
+    document.getElementById("recYield").textContent = r.expected_yield + " Quintals";
+    document.getElementById("recProfit").textContent = "₹" + r.expected_profit.toLocaleString();
+    document.getElementById("recFert").textContent = r.fertilizer;
+    document.getElementById("recAlts").innerHTML = r.alternative_crops.map(c => `<span class="badge-green me-1">${c}</span>`).join("");
+  } catch (err) {
+    alert("Prediction error. Make sure the server is running.");
+  }
   btn.innerHTML = '<i class="fas fa-brain"></i> Get AI Recommendation'; btn.disabled = false;
-});
+}
+
+document.getElementById("cropRefreshBtn").addEventListener("click", loadAutoCrop);
+loadAutoCrop();
 
 /* ── Disease Detection ─────────────────────────────────── */
 function previewDiseaseImg(input) {
