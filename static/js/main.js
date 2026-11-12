@@ -1,4 +1,5 @@
 // Shared Frontend JS (Pure JS, API driven)
+// static/js/main.js
 
 document.addEventListener("DOMContentLoaded", () => {
     checkAuthStatus();
@@ -9,11 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadPublicStats() {
     const farmersEl = document.getElementById("stat-farmers");
     if (!farmersEl) return;
-    
+
     try {
         const res = await fetch("/api/public/stats");
         const data = await res.json();
-        
+
         document.getElementById("stat-farmers").textContent = data.farmers;
         document.getElementById("stat-predictions").textContent = data.predictions;
         document.getElementById("stat-districts").textContent = data.districts;
@@ -32,15 +33,17 @@ async function checkAuthStatus() {
                 let dashboardBtn = "";
                 const u = data.user;
                 if (u.role === "admin") {
-                    dashboardBtn = `<a href="/admin" class="btn-ghost-fw"><i class="fas fa-tachometer-alt"></i> Dashboard</a>`;
+                    dashboardBtn = `<a href="/admin-dashboard.html" class="btn-ghost-fw"><i class="fas fa-tachometer-alt"></i> Admin Panel</a>`;
                 } else if (u.role === "farmer") {
                     if (u.profile_completed && u.is_approved) {
                         dashboardBtn = `<a href="/dashboard.html" class="btn-ghost-fw"><i class="fas fa-tachometer-alt"></i> Dashboard</a>`;
                     } else if (!u.profile_completed) {
                         dashboardBtn = `<a href="/profile-setup.html" class="btn-ghost-fw"><i class="fas fa-user-edit"></i> Setup Profile</a>`;
+                    } else if (!u.is_approved) {
+                        dashboardBtn = `<a href="/pending-approval.html" class="btn-ghost-fw"><i class="fas fa-clock"></i> Pending Approval</a>`;
                     }
                 }
-                
+
                 authNav.innerHTML = `
                     ${dashboardBtn}
                     <button onclick="logoutUser()" class="btn-outline-fw">Logout</button>

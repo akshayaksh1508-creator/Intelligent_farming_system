@@ -58,22 +58,26 @@
               </div>
 
               <div class="mt-3">
-                <label class="form-label">Plant Type (Optional)</label>
-                <select id="plant_type" class="form-control-fw">
-                  <option value="Tomato">Tomato</option>
-                  <option value="Rice">Rice</option>
-                  <option value="Wheat">Wheat</option>
-                  <option value="Cotton">Cotton</option>
-                  <option value="Corn">Corn / Maize</option>
-                  <option value="Potato">Potato</option>
-                  <option value="Sugarcane">Sugarcane</option>
-                  <option value="Apple">Apple</option>
-                  <option value="Grape">Grape</option>
-                  <option value="Citrus">Citrus</option>
-                  <option value="Peach">Peach</option>
-                  <option value="Cherry">Cherry</option>
-                  <option value="Strawberry">Strawberry</option>
-                  <option value="Pepper">Pepper</option>
+                <label class="form-label">Select Crop Type</label>
+                <select id="plant_type" name="plant_type" class="form-control-fw" required>
+                  <option value="banana">Banana</option>
+                  <option value="chilli">Chilli</option>
+                  <option value="cotton">Cotton</option>
+                  <option value="grape">Grape</option>
+                  <option value="groundnut">Groundnut</option>
+                  <option value="maize">Maize / Corn</option>
+                  <option value="mango">Mango</option>
+                  <option value="okra">Okra (Ladies Finger)</option>
+                  <option value="paddy_doctor">Paddy / Rice</option>
+                  <option value="pea">Pea</option>
+                  <option value="pigeon_pea">Pigeon Pea (Tur / Red Gram)</option>
+                  <option value="pomegranate">Pomegranate</option>
+                  <option value="potato">Potato</option>
+                  <option value="soybean">Soybean</option>
+                  <option value="sugarcane">Sugarcane</option>
+                  <option value="tomato" selected>Tomato</option>
+                  <option value="turmeric">Turmeric</option>
+                  <option value="wheat">Wheat</option>
                 </select>
               </div>
 
@@ -100,7 +104,6 @@
 
             <!-- Low confidence warning (shown when model is unsure) -->
             <div id="disLowConfWarn" style="display:none;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.88rem;color:#92400e;"></div>
-
 
             <div class="p-3 bg-light rounded mb-3">
               <strong>⚠️ Symptoms:</strong>
@@ -185,12 +188,13 @@
             warnEl.style.display = "none";
           }
 
-          document.getElementById("disSeverity").textContent = r.severity.toUpperCase() + " SEVERITY";
+          const sevText = r.severity || (r.is_healthy ? "None" : "Moderate");
+          document.getElementById("disSeverity").textContent = sevText.toUpperCase() + " SEVERITY";
           // Color the severity badge
           const sevEl = document.getElementById("disSeverity");
-          sevEl.style.background = r.severity === "Very High" ? "#7f1d1d" :
-                                   r.severity === "High" ? "#dc2626" :
-                                   r.severity === "None" ? "#16a34a" : "#d97706";
+          sevEl.style.background = sevText === "Very High" ? "#7f1d1d" :
+                                   sevText === "High" ? "#dc2626" :
+                                   sevText === "None" ? "#16a34a" : "#d97706";
 
           document.getElementById("disSymptoms").textContent = r.symptoms;
           document.getElementById("disMedicine").textContent = r.medicine;
@@ -209,4 +213,3 @@
   </script>
 </body>
 </html>
-
