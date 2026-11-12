@@ -1,0 +1,20 @@
+{
+  "banana": ["Bacterial_Soft_Rot", "Black_Sigatoka", "Healthy", "Panama_Disease", "Yellow_Sigatoka"],
+  "chilli": ["Bacterial_Spot", "Cercospora_Leaf_Spot", "Curl_Virus", "Healthy", "White_Spot"],
+  "cotton": ["Bacterial_Blight", "Curl_Virus", "Healthy"],
+  "grape": ["Black_Rot", "Esca", "Healthy", "Leaf_Blight"],
+  "groundnut": ["Alternaria_Leaf_Spot", "Healthy", "Leaf_Spot_Early_Late", "Rosette", "Rust"],
+  "maize": ["Healthy", "Maize_Leaf_Spot", "Maize_Streak_Virus"],
+  "mango": ["Bacterial_Blackspot", "Die_Back", "Healthy", "Sooty_Mould"],
+  "okra": ["Alternaria_Leaf_Spot", "Cercospora_Leaf_Spot", "Downy_Mildew", "Healthy", "Leaf_Curly_Virus", "Phyllosticta_Leaf_Spot"],
+  "paddy_doctor": ["Bacterial_Leaf_Blight", "Bacterial_Leaf_Streak", "Bacterial_Panicle_Blight", "Blast", "Brown_Spot", "Downy_Mildew", "Healthy", "Tungro"],
+  "pea": ["Anthracnose", "Ascochyta_Blight", "Botrytis_Blight", "Downy_Mildew", "Fusarium_Wilt", "Healthy", "Pea_Leaf_Roll_Virus", "Powdery_Mildew", "Stem_Rot"],
+  "pigeon_pea": ["Healthy", "Leaf_Spot", "Sterility_Mosaic"],
+  "pomegranate": ["Alternaria", "Anthracnose", "Bacterial_Blight", "Cercospora", "Healthy"],
+  "potato": ["Early_Blight", "Healthy", "Late_Blight"],
+  "soybean": ["Bacterial_Blight", "Cercospora_Leaf_Blight", "Healthy", "Rust", "Sudden_Death_Syndrome"],
+  "sugarcane": ["Healthy", "Mosaic", "Red_Rot", "Rust", "Yellow"],
+  "tomato": ["Early_Blight", "Healthy", "Late_Blight", "Spotted_Wilt_Virus"],
+  "turmeric": ["Blotch", "Healthy", "Leaf_Spot"],
+  "wheat": ["Healthy", "Leaf_Rust"]
+}

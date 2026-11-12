@@ -19,7 +19,7 @@
     <ul class="nav-links">
       <li><a href="/index.html">Home</a></li>
       <li><a href="/crop.html" class="active">Crop Rec.</a></li>
-      <li><a href="/disease.html">Disease Detection</a></li>
+      <li><a href="/disease.html?v=cnn18">Disease Detection</a></li>
       <li><a href="/weather.html">Weather</a></li>
       <li><a href="/marketplace.html">Marketplace</a></li>
       <li><a href="/schemes.html">Schemes</a></li>
@@ -41,70 +41,27 @@
 
     <div class="container-fw py-4">
       <div class="row g-4">
-        <!-- Input Form -->
+        <!-- Auto Data Panel -->
         <div class="col-lg-5">
           <div class="glass-card p-4">
-            <h4 class="font-weight-bold mb-3">🧪 Land & Climate Data</h4>
-            <form id="cropForm">
-              <div class="row g-3">
-                <div class="col-6">
-                  <label class="form-label">State</label>
-                  <select id="state" class="form-control-fw">
-                    <option>Karnataka</option><option>Maharashtra</option><option>Punjab</option><option>Gujarat</option><option>Tamil Nadu</option><option>Uttar Pradesh</option>
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Season</label>
-                  <select id="season" class="form-control-fw">
-                    <option>Kharif</option><option>Rabi</option><option>Zaid</option><option>Annual</option>
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Soil Type</label>
-                  <select id="soil_type" class="form-control-fw">
-                    <option>Loamy</option><option>Sandy Loam</option><option>Clayey</option><option>Black</option><option>Red</option>
-                  </select>
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Land Area (Hectare)</label>
-                  <input type="number" id="land_area" class="form-control-fw" value="1.0" step="0.1">
-                </div>
-
-                <div class="col-4">
-                  <label class="form-label">Nitrogen (N)</label>
-                  <input type="number" id="nitrogen" class="form-control-fw" value="80">
-                </div>
-                <div class="col-4">
-                  <label class="form-label">Phosphorus (P)</label>
-                  <input type="number" id="phosphorus" class="form-control-fw" value="60">
-                </div>
-                <div class="col-4">
-                  <label class="form-label">Potassium (K)</label>
-                  <input type="number" id="potassium" class="form-control-fw" value="40">
-                </div>
-
-                <div class="col-6">
-                  <label class="form-label">Soil pH</label>
-                  <input type="number" id="ph" class="form-control-fw" value="6.5" step="0.1">
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Temp (°C)</label>
-                  <input type="number" id="temperature" class="form-control-fw" value="28">
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Humidity (%)</label>
-                  <input type="number" id="humidity" class="form-control-fw" value="65">
-                </div>
-                <div class="col-6">
-                  <label class="form-label">Rainfall (mm)</label>
-                  <input type="number" id="rainfall" class="form-control-fw" value="80">
-                </div>
-              </div>
-
-              <button type="submit" class="btn-primary-fw w-100 mt-4" style="justify-content:center;padding:0.8rem;">
-                <i class="fas fa-brain"></i> Get AI Recommendation
-              </button>
-            </form>
+            <h4 class="font-weight-bold mb-3">🛰️ Auto-Collected Farm Data</h4>
+            <div id="sensorBadge" class="badge-green w-100 mb-3" style="justify-content:center;padding:0.6rem;">
+              <i class="fas fa-satellite-dish me-2"></i>Checking ESP32 sensor...
+            </div>
+            <table class="table table-sm mb-0" id="sourcesTable">
+              <thead>
+                <tr><th>Parameter</th><th>Value</th><th>Source</th></tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="3" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+            <button type="button" id="refreshBtn" class="btn-primary-fw w-100 mt-4" style="justify-content:center;padding:0.8rem;">
+              <i class="fas fa-sync-alt"></i> Get AI Recommendation
+            </button>
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-top:1rem;margin-bottom:0;">
+              No manual inputs needed — values are collected automatically from your ESP32 sensor, live weather, and seasonal defaults.
+            </p>
           </div>
         </div>
 
@@ -113,7 +70,7 @@
           <div id="placeholder" class="glass-card text-center p-5">
             <div style="font-size:4rem;margin-bottom:1rem;">🌾</div>
             <h4>Ready for Analysis</h4>
-            <p style="color:var(--text-muted);">Fill parameters and click "Get AI Recommendation" to receive predictions.</p>
+            <p style="color:var(--text-muted);">Values are collected automatically from your sensors and weather — click "Get AI Recommendation" to receive predictions.</p>
           </div>
 
           <div id="resultBox" style="display:none;" class="glass-card p-4">
@@ -153,45 +110,71 @@
 
   <script src="/static/js/main.js?v=4"></script>
   <script>
-    document.getElementById("cropForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const body = {
-        state: document.getElementById("state").value,
-        season: document.getElementById("season").value,
-        soil_type: document.getElementById("soil_type").value,
-        land_area: parseFloat(document.getElementById("land_area").value),
-        nitrogen: parseFloat(document.getElementById("nitrogen").value),
-        phosphorus: parseFloat(document.getElementById("phosphorus").value),
-        potassium: parseFloat(document.getElementById("potassium").value),
-        ph: parseFloat(document.getElementById("ph").value),
-        temperature: parseFloat(document.getElementById("temperature").value),
-        humidity: parseFloat(document.getElementById("humidity").value),
-        rainfall: parseFloat(document.getElementById("rainfall").value),
-      };
+    const SOURCE_LABELS = {
+      temperature: "Temperature", humidity: "Humidity", rainfall: "Rainfall",
+      nitrogen: "Nitrogen (N)", phosphorus: "Phosphorus (P)", potassium: "Potassium (K)",
+      ph: "Soil pH", soil_type: "Soil Type", season: "Season", land_area: "Land Area",
+      soil_moisture: "Soil Moisture (info)"
+    };
+    const SOURCE_ORDER = ["temperature", "humidity", "rainfall", "nitrogen", "phosphorus",
+      "potassium", "ph", "soil_type", "season", "land_area", "soil_moisture"];
 
+    function fmtValue(v) {
+      return typeof v === "number" ? String(Math.round(v * 10) / 10) : v;
+    }
+
+    function sourceBadgeHtml(source) {
+      if (source.startsWith("ESP32")) return `<span class="badge-green">🟢 ${source}</span>`;
+      if (source.startsWith("Weather")) return `<span class="badge-blue">🌤️ ${source}</span>`;
+      if (source.startsWith("Auto")) return `<span class="badge-blue">📅 ${source}</span>`;
+      return `<span class="badge-muted">${source}</span>`;
+    }
+
+    async function loadAutoCrop() {
+      const btn = document.getElementById("refreshBtn");
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Collecting data...'; btn.disabled = true;
       try {
-        const res = await fetch("/api/crop/predict", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
+        const res = await fetch("/api/crop/auto");
         const data = await res.json();
-        if (data.success) {
-          const r = data.result;
-          document.getElementById("placeholder").style.display = "none";
-          document.getElementById("resultBox").style.display = "block";
+        if (!data.success) { alert(data.error || "Prediction error"); return; }
 
-          document.getElementById("recCrop").textContent = r.recommended_crop;
-          document.getElementById("recConfidence").textContent = r.confidence + "%";
-          document.getElementById("recYield").textContent = r.expected_yield + " Quintals";
-          document.getElementById("recProfit").textContent = "₹" + r.expected_profit.toLocaleString();
-          document.getElementById("recFertilizer").textContent = r.fertilizer;
-          document.getElementById("recAlts").innerHTML = r.alternative_crops.map(c => `<span class="badge-green">${c}</span>`).join(" ");
+        const badge = document.getElementById("sensorBadge");
+        if (data.sensor_connected) {
+          badge.innerHTML = '<i class="fas fa-satellite-dish me-2"></i>ESP32 sensor connected — live sensor values in use';
+        } else {
+          badge.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>ESP32 offline — using weather & seasonal defaults';
         }
+        badge.style.background = data.sensor_connected ? "" : "rgba(217,119,6,0.15)";
+        badge.style.color = data.sensor_connected ? "" : "#b45309";
+
+        const keys = SOURCE_ORDER.filter(k => data.sources[k]);
+        const tbody = document.querySelector("#sourcesTable tbody");
+        tbody.innerHTML = keys.map(k => {
+          const s = data.sources[k];
+          return `<tr>
+            <td style="font-weight:600;">${SOURCE_LABELS[k] || k}</td>
+            <td>${fmtValue(s.value)}${s.unit ? " " + s.unit : ""}</td>
+            <td>${sourceBadgeHtml(s.source)}</td>
+          </tr>`;
+        }).join("");
+
+        const r = data.result;
+        document.getElementById("placeholder").style.display = "none";
+        document.getElementById("resultBox").style.display = "block";
+        document.getElementById("recCrop").textContent = r.recommended_crop;
+        document.getElementById("recConfidence").textContent = r.confidence + "%";
+        document.getElementById("recYield").textContent = r.expected_yield + " Quintals";
+        document.getElementById("recProfit").textContent = "₹" + r.expected_profit.toLocaleString();
+        document.getElementById("recFertilizer").textContent = r.fertilizer;
+        document.getElementById("recAlts").innerHTML = r.alternative_crops.map(c => `<span class="badge-green">${c}</span>`).join(" ");
       } catch (err) {
-        alert("Error generating prediction");
+        alert("Error generating prediction. Make sure the server is running.");
       }
-    });
+      btn.innerHTML = '<i class="fas fa-sync-alt"></i> Get AI Recommendation'; btn.disabled = false;
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", loadAutoCrop);
+    loadAutoCrop();
   </script>
 </body>
 </html>

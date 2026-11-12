@@ -69,3 +69,35 @@ rainfall still use documented defaults because those sensors are not connected y
 
 - **Email**: `ramesh@example.com`
 - **Password**: `farmer123`
+
+---
+
+## 🔬 Real AI disease information (recommended)
+
+When a disease is detected, Farm Wise AI asks **Google Gemini** for the real
+treatment information — accurate symptoms, chemical treatment with dosages,
+medicine names available in India, organic remedies and prevention — instead
+of generic template text. Without a key the app still works, falling back to
+the built-in agronomic database.
+
+Get a free API key (no credit card needed for the free tier) at
+https://aistudio.google.com/apikey, then set it before starting the server:
+
+```powershell
+$env:GEMINI_API_KEY = "your-key-here"
+python app.py
+```
+
+Detection pipeline: the CNN classifies the disease from the photo → Gemini
+writes the treatment info → built-in agronomic database as final fallback.
+The result includes `diagnosis_source` (`gemini_vision`, `gemini_advisory`,
+or `cnn_agronomic`).
+
+To also make the **mobile app's on-device results** show real AI information,
+regenerate its bundled advisory file once with your key:
+
+```powershell
+$env:GEMINI_API_KEY = "your-key-here"
+python disease_detection/generate_advisory_bundle.py
+```
+

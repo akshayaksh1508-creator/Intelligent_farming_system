@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import tempfile
 
 import numpy as np
@@ -7,6 +8,7 @@ import torch.nn as nn
 from PIL import Image, ImageOps
 
 from ml_models.disease_model import get_agronomic_advisory
+from ml_models.gemini_disease_service import generate_disease_advisory
 
 
 # ============================================================
@@ -22,11 +24,7 @@ MODEL_PATH = (
     / "disease_cnn_30_epochs.pth"
 )
 
-DATASET_DIR = (
-    PROJECT_ROOT
-    / "disease_dataset"
-    / "processed"
-)
+MAPPING_PATH = PROJECT_ROOT / "disease_detection" / "class_mapping.json"
 
 
 # ============================================================
@@ -44,11 +42,12 @@ device = torch.device(
 # CROP / DISEASE MAPPINGS
 # ============================================================
 
-crops = sorted({
-    crop_dir.name
-    for crop_dir in DATASET_DIR.iterdir()
-    if crop_dir.is_dir()
-})
+with open(MAPPING_PATH, "r", encoding="utf-8") as mapping_file:
+    disease_classes = json.load(mapping_file)
+
+# This order is part of the trained CNN checkpoint.  It is stored with the
+# deployment files so prediction does not require the original training data.
+crops = list(disease_classes.keys())
 
 
 crop_to_index = {
@@ -57,20 +56,20 @@ crop_to_index = {
 }
 
 
-disease_to_index = {}
+disease_to_index = {
+    crop: {disease: index for index, disease in enumerate(diseases)}
+    for crop, diseases in disease_classes.items()
+}
 
-for crop in crops:
-
-    diseases = sorted({
-        disease_dir.name
-        for disease_dir in (DATASET_DIR / crop).iterdir()
-        if disease_dir.is_dir()
-    })
-
-    disease_to_index[crop] = {
-        disease: index
-        for index, disease in enumerate(diseases)
-    }
+# Names used by the existing website that differ from the dataset folder names.
+# This keeps the current UI compatible with the trained model.
+CROP_ALIASES = {
+    "rice": "paddy_doctor",
+    "paddy": "paddy_doctor",
+    "corn": "maize",
+    "chili": "chilli",
+    "pepper": "chilli",
+}
 
 
 index_to_disease = {
@@ -196,24 +195,22 @@ class BaselineCNN(nn.Module):
 # LOAD TRAINED MODEL
 # ============================================================
 
-model = BaselineCNN(
-    crops,
-    disease_to_index
-)
+_model = None
 
 
-model.load_state_dict(
-    torch.load(
-        MODEL_PATH,
-        map_location=device,
-        weights_only=True
-    )
-)
-
-
-model.to(device)
-
-model.eval()
+def get_model():
+    """Load the trained checkpoint only when a disease analysis is requested."""
+    global _model
+    if _model is None:
+        if not MODEL_PATH.exists():
+            raise FileNotFoundError(f"CNN weights not found: {MODEL_PATH}")
+        _model = BaselineCNN(crops, disease_to_index)
+        _model.load_state_dict(
+            torch.load(MODEL_PATH, map_location=device, weights_only=True)
+        )
+        _model.to(device)
+        _model.eval()
+    return _model
 
 
 # ============================================================
@@ -240,7 +237,7 @@ def predict_image(image_path, crop_name):
         )
 
 
-    crop_name = crop_name.strip().lower()
+    crop_name = CROP_ALIASES.get(crop_name.strip().lower(), crop_name.strip().lower())
 
 
     if crop_name not in crop_to_index:
@@ -305,7 +302,7 @@ def predict_image(image_path, crop_name):
 
     with torch.inference_mode():
 
-        outputs = model(
+        outputs = get_model()(
             image,
             crop_label
         )
@@ -362,7 +359,7 @@ def predict_uploaded_image(image_bytes, crop_name):
     the existing disease-detection frontend.
     """
 
-    crop_name = crop_name.strip().lower()
+    crop_name = CROP_ALIASES.get(crop_name.strip().lower(), crop_name.strip().lower())
 
 
     if crop_name not in crop_to_index:
@@ -421,9 +418,22 @@ def predict_uploaded_image(image_bytes, crop_name):
         )
 
 
-        advisory = get_agronomic_advisory(
-            class_name
-        )
+        is_healthy = prediction["disease"].lower() == "healthy"
+
+
+        # The CNN decides the disease; the AI generates real, researched
+        # treatment information for it. Falls back to the built-in agronomic
+        # database when no API key is configured or the API call fails.
+        advisory = None
+        if not is_healthy:
+            advisory = generate_disease_advisory(
+                class_name,
+                prediction["confidence"]
+            )
+        if advisory is None:
+            advisory = get_agronomic_advisory(
+                class_name
+            )
 
 
         # ----------------------------------------------------
@@ -455,6 +465,11 @@ def predict_uploaded_image(image_bytes, crop_name):
             "is_healthy": (
                 prediction["disease"].lower()
                 == "healthy"
+            ),
+
+            "diagnosis_source": advisory.get(
+                "diagnosis_source",
+                "cnn_agronomic"
             )
         }
 

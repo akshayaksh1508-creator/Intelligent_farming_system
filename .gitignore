@@ -5,12 +5,7 @@ __pycache__/
 .env
 .DS_Store
 .vscode/
-
-# Intelligent Farming System - Disease Detection
-disease_dataset/
-disease_detection/cache/
-
-# Local SQLite database
-instance/farmwise.db
-
+instance/
 static/uploads/
+.ml-export/
+.test-assets/
