@@ -71,6 +71,7 @@ export interface DiseaseResult {
   organic_solution: string;
   preventive_measures: string;
   is_healthy: boolean;
+  diagnosis_source?: string;
 }
 
 export interface Product {

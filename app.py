@@ -487,6 +487,49 @@ def create_app(env="development"):
 
         return jsonify({"success": True, "result": res})
 
+    @app.route("/api/disease/advisory", methods=["POST"])
+    def api_disease_advisory():
+        data = request.get_json(silent=True) or {}
+        crop = str(data.get("crop", "")).strip()
+        disease = str(data.get("disease", "")).strip()
+        try:
+            confidence = float(data.get("confidence", 85.0))
+        except (TypeError, ValueError):
+            confidence = 85.0
+
+        if not crop or not disease:
+            return jsonify({"success": False, "error": "crop and disease are required"}), 400
+
+        from ml_models.disease_model import get_agronomic_advisory
+        from ml_models.gemini_disease_service import generate_disease_advisory
+
+        class_name = f"{crop}_{disease}"
+        is_healthy = disease.lower() == "healthy"
+
+        advisory = None
+        if not is_healthy:
+            advisory = generate_disease_advisory(class_name, confidence)
+        if advisory is None:
+            advisory = get_agronomic_advisory(class_name)
+
+        result = {
+            "disease_name": advisory["disease_name"],
+            "plant_type": advisory["plant_type"],
+            "severity": advisory["severity"],
+            "confidence": round(confidence, 2),
+            "symptoms": advisory["symptoms"],
+            "treatment": advisory["treatment"],
+            "medicine": advisory["medicine"],
+            "organic_solution": advisory["organic_solution"],
+            "preventive_measures": advisory["preventive_measures"],
+            "is_healthy": is_healthy,
+            "diagnosis_source": advisory.get(
+                "diagnosis_source",
+                "healthy" if is_healthy else "cnn_agronomic",
+            ),
+        }
+        return jsonify({"success": True, "result": result})
+
     # Weather API
     @app.route("/api/weather", methods=["GET"])
     def api_weather():

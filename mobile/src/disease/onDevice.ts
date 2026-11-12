@@ -4,6 +4,7 @@ import {
   loadTensorflowModel,
   type TensorflowModel,
 } from "react-native-fast-tflite";
+import { apiPost } from "../api";
 import { DiseaseResult } from "../types";
 
 // The CNN (disease_cnn_30_epochs.pth) shared backbone exported to TFLite by
@@ -191,6 +192,28 @@ export function buildResult(
   const advisory = advisoryJson[`${cropKey}_${disease}`];
   return {
     ...advisory,
+    confidence,
+    is_healthy: disease === "Healthy",
+    diagnosis_source: disease === "Healthy" ? "healthy" : "offline_bundle",
+  };
+}
+
+// Fetch live, ICAR-aligned Symptoms / Treatment / Medicine / Organic /
+// Preventive details from the Flask Gemini API when online.
+export async function fetchLiveAdvisory(
+  cropKey: string,
+  disease: string,
+  confidence: number
+): Promise<DiseaseResult> {
+  const res = await apiPost<{ success: boolean; result?: DiseaseResult }>(
+    "/api/disease/advisory",
+    { crop: cropKey, disease, confidence }
+  );
+  if (!res?.result) {
+    throw new Error("Empty advisory response");
+  }
+  return {
+    ...res.result,
     confidence,
     is_healthy: disease === "Healthy",
   };

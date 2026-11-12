@@ -17,6 +17,7 @@ import {
   classifyEmbedding,
   cropKeyFor,
   embedPhoto,
+  fetchLiveAdvisory,
   loadDiseaseModel,
 } from "../disease/onDevice";
 import { colors, gradients, radius, shadow } from "../theme";
@@ -125,7 +126,17 @@ export default function DiseaseScreen() {
         height: image.height,
       });
       const { disease, confidence } = classifyEmbedding(embedding, cropKey);
-      setResult(buildResult(cropKey, disease, confidence));
+      const localResult = buildResult(cropKey, disease, confidence);
+      if (disease === "Healthy") {
+        setResult(localResult);
+      } else {
+        try {
+          const apiResult = await fetchLiveAdvisory(cropKey, disease, confidence);
+          setResult(apiResult);
+        } catch {
+          setResult(localResult);
+        }
+      }
     } catch {
       setError("Couldn't analyze that photo. Try a clearer, closer shot of the leaf.");
     } finally {
@@ -143,7 +154,7 @@ export default function DiseaseScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.title}>Disease Scan</Text>
               <Text style={styles.subtitle}>
-                Photograph a plant leaf — the CNN detects diseases across 18 crops, right on your phone.
+                On-device CNN detects diseases across 18 crops and fetches AI-verified treatments when online.
               </Text>
             </View>
           </LinearGradient>
@@ -219,6 +230,7 @@ export default function DiseaseScreen() {
                   </Text>
                   <Text style={styles.resultSub}>
                     {result.plant_type} · {result.confidence}% confidence
+                    {result.severity && result.severity !== "None" ? ` · ${result.severity} severity` : ""}
                   </Text>
                 </View>
               </LinearGradient>
@@ -226,6 +238,7 @@ export default function DiseaseScreen() {
               <Card style={styles.resultDetails}>
                 {!result.is_healthy ? (
                   <>
+                    <SourceBanner source={result.diagnosis_source} />
                     <DetailSection icon="medkit" title="Symptoms" text={result.symptoms} />
                     <DetailSection icon="bandage" title="Treatment" text={result.treatment} />
                     <DetailSection icon="medical" title="Medicine" text={result.medicine} />
@@ -245,6 +258,27 @@ export default function DiseaseScreen() {
       </ScrollView>
       </SafeAreaView>
     </GlassBackground>
+  );
+}
+
+function SourceBanner({ source }: { source?: string }) {
+  const isLiveAi = source === "gemini_advisory" || source === "gemini_vision";
+  const label = isLiveAi
+    ? "Live AI-Verified Treatment (Gemini API)"
+    : source === "cnn_agronomic"
+      ? "Server fallback DB — set GEMINI_API_KEY on server for live AI treatments"
+      : "Offline reference bundle — connect to server for live AI treatments";
+  return (
+    <View style={[styles.sourcePill, isLiveAi ? styles.sourcePillLive : styles.sourcePillFallback]}>
+      <Ionicons
+        name={isLiveAi ? "sparkles" : "information-circle"}
+        size={14}
+        color={isLiveAi ? colors.primaryDark : "#92400e"}
+      />
+      <Text style={[styles.sourceText, isLiveAi ? styles.sourceTextLive : styles.sourceTextFallback]}>
+        {label}
+      </Text>
+    </View>
   );
 }
 
@@ -355,6 +389,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     marginTop: 0,
   },
+  sourcePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: radius.sm,
+    marginBottom: 14,
+  },
+  sourcePillLive: { backgroundColor: colors.primaryLight },
+  sourcePillFallback: { backgroundColor: "#fef3c7" },
+  sourceText: { flex: 1, fontSize: 12, fontWeight: "600", lineHeight: 16 },
+  sourceTextLive: { color: colors.primaryDark },
+  sourceTextFallback: { color: "#92400e" },
   detail: { marginBottom: 14 },
   detailHead: { flexDirection: "row", alignItems: "center", gap: 7, marginBottom: 4 },
   detailIcon: {

@@ -12,7 +12,23 @@ from pathlib import Path
 
 
 # ── Gemini API configuration ──────────────────────────────────
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+def _load_dotenv_if_present() -> None:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+    except ImportError:
+        pass
+
+
+def get_gemini_api_key() -> str:
+    key = os.environ.get("GEMINI_API_KEY", "").strip()
+    if not key:
+        _load_dotenv_if_present()
+        key = os.environ.get("GEMINI_API_KEY", "").strip()
+    return key
+
+
+GEMINI_API_KEY = get_gemini_api_key()
 
 # Expert prompt for disease detection
 DISEASE_EXPERT_PROMPT = """You are an expert plant pathologist and agricultural scientist with deep knowledge of crop diseases.
@@ -53,14 +69,15 @@ def analyze_with_gemini(image_bytes: bytes, plant_type: str = "Unknown") -> dict
     Returns a result dict matching the disease_model.predict() format,
     or None if the API call fails.
     """
-    if not GEMINI_API_KEY:
+    api_key = get_gemini_api_key()
+    if not api_key:
         return None
 
     try:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        client = genai.Client(api_key=api_key)
 
         # Build the prompt with plant type hint
         prompt = DISEASE_EXPERT_PROMPT
@@ -159,7 +176,8 @@ def generate_disease_advisory(class_name: str, confidence: float) -> dict | None
     to the built-in agronomic database). Results are cached in memory because
     the correct advice for a disease does not change between scans.
     """
-    if not GEMINI_API_KEY:
+    api_key = get_gemini_api_key()
+    if not api_key:
         return None
 
     cache_key = class_name.strip().lower()
@@ -167,11 +185,22 @@ def generate_disease_advisory(class_name: str, confidence: float) -> dict | None
     if cached:
         return cached
 
-    parts = class_name.replace("___", "_").split("_")
-    crop_key = parts[0].lower() if parts else "plant"
+    normalized = class_name.strip().replace("___", "_")
+    lowered = normalized.lower()
+    crop_key = ""
+    disease_part = ""
+    for prefix in ("paddy_doctor_", "pigeon_pea_"):
+        if lowered.startswith(prefix):
+            crop_key = prefix[:-1]
+            disease_part = normalized[len(prefix):]
+            break
+    if not crop_key:
+        parts = normalized.split("_", 1)
+        crop_key = parts[0].lower() if parts else "plant"
+        disease_part = parts[1] if len(parts) > 1 else ""
     disease_words = " ".join(
-        p for p in parts[1:] if p.lower() != "healthy"
-    ).replace("_", " ").title()
+        p for p in disease_part.split("_") if p and p.lower() != "healthy"
+    ).title()
     if not disease_words:
         return None
 
@@ -180,7 +209,7 @@ def generate_disease_advisory(class_name: str, confidence: float) -> dict | None
     try:
         from google import genai
 
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
             model="gemini-2.0-flash",
             contents=ADVISORY_PROMPT.format(
@@ -226,4 +255,4 @@ def _detect_mime_type(image_bytes: bytes) -> str:
 
 def is_gemini_available() -> bool:
     """Returns True if the Gemini API key is configured."""
-    return bool(GEMINI_API_KEY)
+    return bool(get_gemini_api_key())
